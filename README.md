@@ -1,4 +1,4 @@
-![ARES](https://repository-images.githubusercontent.com/356149284/6aef6780-9bc1-11eb-8ee7-3ffa3532959b)
+![ARES](ares_middle.png)
 # ARES
 [![Generic badge](https://img.shields.io/badge/mavenCentral-1.0.0RELEASE-000000.svg)](https://search.maven.org/artifact/io.github.sergkhram/ares-plugin/1.0.0-RELEASE/jar)
 [![Build Status](https://github.com/SergKhram/ARES/workflows/build/badge.svg)](https://github.com/SergKhram/ARES/actions)
