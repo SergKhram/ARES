@@ -3,7 +3,7 @@
 # ARES
 [![Generic badge](https://img.shields.io/badge/mavenCentral-1.0.0RELEASE-000000.svg)](https://search.maven.org/artifact/io.github.sergkhram/ares-plugin/1.0.0-RELEASE/jar)
 [![Build Status](https://github.com/SergKhram/ARES/workflows/build/badge.svg)](https://github.com/SergKhram/ARES/actions)
-![GitHub](https://img.shields.io/github/license/SergKhram/ARES)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 **ARES(Android Report Synchro) Plugin**
 
