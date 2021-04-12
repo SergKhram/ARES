@@ -1,4 +1,6 @@
 # ARES
+[![Generic badge](https://img.shields.io/badge/mavenCentral-1.0.0RELEASE-<COLOR>.svg)](https://search.maven.org/artifact/io.github.sergkhram/ares-plugin/1.0.0-RELEASE/jar)
+
 **ARES(Android Report Synchro) Plugin**
 
 Based on files from execution of allure-kotlin and marathon.
