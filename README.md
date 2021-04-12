@@ -1,4 +1,4 @@
-![ARES](ares_logo.png)
+![ARES](ares3.jpg)
 ==========
 # ARES
 [![Generic badge](https://img.shields.io/badge/mavenCentral-1.0.0RELEASE-000000.svg)](https://search.maven.org/artifact/io.github.sergkhram/ares-plugin/1.0.0-RELEASE/jar)
