@@ -6,6 +6,22 @@ Based on files from execution of allure-kotlin and marathon.
 allure-kotlin: https://github.com/allure-framework/allure-kotlin
 marathon: https://github.com/Malinskiy/marathon
 
+## Quick start
+```
+repositories {
+  mavenCentral()
+}
+```
+```
+implementation 'io.github.sergkhram:ares-plugin:1.0.0-RELEASE'
+```
+```
+plugins {
+  id 'io.github.sergkhram.aresPlugin'
+}
+```
+
+
 ## Tasks
 > - **reportSync** is required to copy videos, environment file and device allure results data to folder allure-results.
 ## Properties
