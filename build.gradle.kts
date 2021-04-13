@@ -1,7 +1,7 @@
 import java.net.URI
 
 group = "io.github.sergkhram"
-version = "1.0.0-RELEASE"
+version = "1.0.1-RELEASE"
 
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.8.9")
@@ -34,8 +34,6 @@ repositories {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-//    withJavadocJar()
-//    withSourcesJar()
 }
 
 signing {
@@ -59,7 +57,6 @@ publishing {
 
     publications {
         create("default", MavenPublication::class.java) {
-//            customizePom(pom)
             from(project.components["java"])
             artifact(sourcesJar)
             artifact(javadocJar)
@@ -99,30 +96,3 @@ publishing {
         }
     }
 }
-
-//fun customizePom(pom: org.gradle.api.publish.maven.MavenPom) {
-//    pom.apply {
-//        name.set("ares-plugin")
-//        url.set("https://github.com/SergKhram/ARES")
-//        description.set("Android report synchro plugin")
-//
-//        this.licenses {
-//            license {
-//                name.set("The Apache License, Version 2.0")
-//                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-//            }
-//        }
-//
-//        this.developers {
-//            developer {
-//                id.set("serg-khram-team")
-//                name.set("Sergei Khramkov")
-//                email.set("quigon3@yandex.ru")
-//            }
-//        }
-//
-//        this.scm {
-//            url.set("https://github.com/SergKhram/ARES")
-//        }
-//    }
-//}
