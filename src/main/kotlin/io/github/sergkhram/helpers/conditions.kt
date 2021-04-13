@@ -11,5 +11,9 @@ internal val isAppropriateMarathonResultFile: (File, ObjectMapper, JsonNode) -> 
     val currentMarathonFile = marathonAllureFile.asJson(mapper)
     val packageLabel = currentMarathonFile.getPackageLabel()
     currentDeviceFile.getFullName() == (packageLabel + "." + currentMarathonFile.getFullName()) &&
-            currentMarathonFile.getStartTime() in currentDeviceFile.getStartTime()..currentDeviceFile.getStopTime()
+        (
+            currentMarathonFile.getStartTime() in currentDeviceFile.getStartTime()..currentDeviceFile.getStopTime() ||
+            currentMarathonFile.getStopTime() in currentDeviceFile.getStartTime()..currentDeviceFile.getStopTime() ||
+            (currentMarathonFile.getStartTime() + currentMarathonFile.getStopTime())/2 in currentDeviceFile.getStartTime()..currentDeviceFile.getStopTime()
+        )
 }
