@@ -1,4 +1,4 @@
-![ARES](ares_blank.jpg)
+![ARES](ares_blank.png)
 ==========
 # ARES
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.sergkhram/ares-plugin.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.sergkhram%22%20AND%20a:%22ares-plugin%22)
