@@ -2,6 +2,7 @@ package io.github.sergkhram
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.github.sergkhram.helpers.pforEach
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -9,21 +10,17 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
-internal val buildType: String by lazy {
-    System.getProperty("buildType") ?: "debug"
-}
-
 internal fun copyVideos(projectDirectory: String) {
     try {
         File(
-                "$projectDirectory/build/reports/marathon/${buildType}AndroidTest/${ScreenRecordAttachment.directoryName}/omni"
+                "$projectDirectory/build/reports/marathon/${Configuration.buildType}AndroidTest/${ScreenRecordAttachment.directoryName}/omni"
         ).listFiles()!!.filter { it.isDirectory }.forEach { vidDir ->
             vidDir.listFiles()!!.filter { it.isFile }.forEach { video ->
                 video.copyFile(projectDirectory)
             }
         }
     } catch (e: KotlinNullPointerException) {
-        throw CustomException("There is no $projectDirectory/build/reports/marathon/${buildType}AndroidTest/${ScreenRecordAttachment.directoryName}/omni directory. Check the attachmentType property")
+        throw CustomException("There is no $projectDirectory/build/reports/marathon/${Configuration.buildType}AndroidTest/${ScreenRecordAttachment.directoryName}/omni directory. Check the attachmentType property")
     }
 }
 
@@ -31,7 +28,7 @@ internal fun copyFiles(dir: File, projectDirectory: String, condition: (File) ->
     val listOfAllureFiles = dir.listFiles()!!.filter { it.isFile && condition(it) }
     listOfAllureFiles?.let {
         if (it.size > 500) {
-            runBlocking(newFixedThreadPoolContext(it.size, "allure-files-copier-pool")) {
+            runBlocking(newFixedThreadPoolContext(it.size, "allure-files-copier-pool-${condition.toString()}")) {
                 it.pforEach(this.coroutineContext) { file ->
                     file.copyFile(projectDirectory)
                 }

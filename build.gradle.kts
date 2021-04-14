@@ -8,6 +8,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(gradleApi())
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+    implementation("com.malinskiy:adam:0.2.3")
 }
 
 plugins {
