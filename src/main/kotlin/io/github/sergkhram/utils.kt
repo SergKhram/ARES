@@ -13,7 +13,7 @@ import java.nio.file.Paths
 internal fun copyVideos(projectDirectory: String) {
     try {
         File(
-                "$projectDirectory/build/reports/marathon/${Configuration.buildType}AndroidTest/${ScreenRecordAttachment.directoryName}/omni"
+            "$projectDirectory/build/reports/marathon/${Configuration.buildType}AndroidTest/${ScreenRecordAttachment.directoryName}/omni"
         ).listFiles()!!.filter { it.isDirectory }.forEach { vidDir ->
             vidDir.listFiles()!!.filter { it.isFile }.forEach { video ->
                 video.copyFile(projectDirectory)
@@ -43,8 +43,8 @@ internal fun copyFiles(dir: File, projectDirectory: String, condition: (File) ->
 
 internal fun File.copyFile(projectDirectory: String) {
     Files.copy(
-            Paths.get(this.path),
-            Paths.get("$projectDirectory/build/allure-results/${this.name}")
+        Paths.get(this.path),
+        Paths.get("$projectDirectory/build/allure-results/${this.name}")
     )
 }
 
