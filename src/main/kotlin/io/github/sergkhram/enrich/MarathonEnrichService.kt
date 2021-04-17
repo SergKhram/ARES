@@ -1,22 +1,28 @@
-package io.github.sergkhram
+package io.github.sergkhram.enrich
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
+import io.github.sergkhram.copyFiles
+import io.github.sergkhram.copyVideos
 import io.github.sergkhram.helpers.*
 import io.github.sergkhram.helpers.isAppropriateMarathonResultFile
-import io.github.sergkhram.helpers.isJsonFile
+import io.github.sergkhram.helpers.isResultJsonFile
+import io.github.sergkhram.helpers.pforEach
+import io.github.sergkhram.prepareVideoAttachments
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
 import java.io.File
 
-class EnrichService(
+class MarathonEnrichService(
         private val marathonAllureResDirectory: File,
         private val mapper: ObjectMapper,
-        private val projectDirectory: String
-) {
+        private val projectDirectory: String,
+        private val allureDeviceResDirectory: File
+): EnrichService {
 
-    fun iterableEnrich(listOfAllureDeviceJsonFiles: List<File>?) {
+    override fun iterableEnrich() {
+        val listOfAllureDeviceJsonFiles = allureDeviceResDirectory.listFiles()?.filter { isResultJsonFile(it) }
         listOfAllureDeviceJsonFiles?.let {
             if(it.size > 200) {
                 runBlocking(newFixedThreadPoolContext(it.size, "allure-results-enricher-pool")) {
@@ -30,6 +36,26 @@ class EnrichService(
                 }
             }
         }
+        copyOtherFiles()
+    }
+
+    private fun copyOtherFiles() {
+        copyVideos(projectDirectory)
+        copyFiles(
+            allureDeviceResDirectory,
+            projectDirectory,
+            isNotJsonFile
+        )
+        copyFiles(
+            marathonAllureResDirectory,
+            projectDirectory,
+            isEnvironmentFile
+        )
+        copyFiles(
+            marathonAllureResDirectory,
+            projectDirectory,
+            isJsonNotTheResultFile
+        )
     }
 
     private fun enrichByMarathonResultFile(
@@ -37,7 +63,7 @@ class EnrichService(
     ) {
         var currentDeviceFile = deviceAllureFile.asJson(mapper)
         marathonAllureResDirectory.listFiles()?.first {
-            isJsonFile(it) &&
+            isResultJsonFile(it) &&
                     isAppropriateMarathonResultFile(it, mapper, currentDeviceFile)
         }?.let { marathonAllureFile ->
             val currentMarathonFile = marathonAllureFile.asJson(mapper)
