@@ -1,13 +1,13 @@
 import java.net.URI
 
 group = "io.github.sergkhram"
-version = "1.0.1-RELEASE"
+version = "1.1.0-RELEASE"
 
 dependencies {
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.8.9")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.3")
     implementation(kotlin("stdlib-jdk8"))
     implementation(gradleApi())
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
     implementation("com.malinskiy:adam:0.2.3")
 }
 
