@@ -3,6 +3,8 @@ package io.github.sergkhram.enrich
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
+import io.github.sergkhram.CustomException
+import io.github.sergkhram.Configuration
 import io.github.sergkhram.copyFiles
 import io.github.sergkhram.copyVideos
 import io.github.sergkhram.helpers.*
@@ -22,7 +24,12 @@ class MarathonEnrichService(
 ): EnrichService {
 
     override fun iterableEnrich() {
-        val listOfAllureDeviceJsonFiles = allureDeviceResDirectory.listFiles()?.filter { isResultJsonFile(it) }
+        lateinit var listOfAllureDeviceJsonFiles: List<File>
+        try {
+            listOfAllureDeviceJsonFiles = allureDeviceResDirectory.listFiles()!!.filter { isResultJsonFile(it) }
+        } catch (e: Exception) {
+            throw CustomException("There is no $projectDirectory/build/reports/marathon/${Configuration.buildType}AndroidTest/allure-device-results directory. Check your buildType")
+        }
         listOfAllureDeviceJsonFiles?.let {
             if(it.size > 200) {
                 runBlocking(newFixedThreadPoolContext(it.size, "allure-results-enricher-pool")) {
