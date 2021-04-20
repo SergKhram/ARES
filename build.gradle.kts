@@ -1,7 +1,7 @@
 import java.net.URI
 
 group = "io.github.sergkhram"
-version = "1.0.1-RELEASE"
+version = "1.0.2-RELEASE"
 
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.8.9")
