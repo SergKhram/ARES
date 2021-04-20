@@ -14,7 +14,8 @@ internal val isAppropriateMarathonResultFile: (File, ObjectMapper, JsonNode) -> 
         (
             currentMarathonFile.getStartTime() in currentDeviceFile.getStartTime()..currentDeviceFile.getStopTime() ||
             currentMarathonFile.getStopTime() in currentDeviceFile.getStartTime()..currentDeviceFile.getStopTime() ||
-            (currentMarathonFile.getStartTime() + currentMarathonFile.getStopTime())/2 in currentDeviceFile.getStartTime()..currentDeviceFile.getStopTime()
+            (currentMarathonFile.getStartTime() + currentMarathonFile.getStopTime())/2 in currentDeviceFile.getStartTime()..currentDeviceFile.getStopTime() ||
+            currentMarathonFile.getStartTime() - currentDeviceFile.getStopTime() < 1000
         )
 }
 internal val isResultJson: (String) -> Boolean = { it.contains("-result.json") }
