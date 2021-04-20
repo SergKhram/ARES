@@ -5,23 +5,44 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.sergkhram.helpers.pforEach
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
-import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
+import java.io.IOException
+import java.nio.file.*
+import java.nio.file.Files.copy
+import java.nio.file.Files.createDirectories
+import java.nio.file.attribute.BasicFileAttributes
+
 
 internal fun copyVideos(projectDirectory: String) {
+    val marathonScreenRecordDirectory = "$projectDirectory/build/reports/marathon/${Configuration.buildType}AndroidTest/${ScreenRecordAttachment.directoryName}"
     try {
         File(
-            "$projectDirectory/build/reports/marathon/${Configuration.buildType}AndroidTest/${ScreenRecordAttachment.directoryName}/omni"
+            marathonScreenRecordDirectory
         ).listFiles()!!.filter { it.isDirectory }.forEach { vidDir ->
-            vidDir.listFiles()!!.filter { it.isFile }.forEach { video ->
-                video.copyFile(projectDirectory)
-            }
+            vidDir.copyFolder(projectDirectory)
         }
     } catch (e: KotlinNullPointerException) {
-        throw CustomException("There is no $projectDirectory/build/reports/marathon/${Configuration.buildType}AndroidTest/${ScreenRecordAttachment.directoryName}/omni directory. Check the attachmentType property")
+        throw CustomException("There is no $marathonScreenRecordDirectory directory. Check the attachmentType property")
     }
+}
+
+@Throws(IOException::class)
+fun File.copyFolder(projectDirectory: String) {
+    val source = this
+    val target = Paths.get("$projectDirectory/build/allure-results/${this.name}")
+    Files.walkFileTree(source.toPath(), object : SimpleFileVisitor<Path>() {
+        @Throws(IOException::class)
+        override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
+            createDirectories(target.resolve(source.toPath().relativize(dir)))
+            return FileVisitResult.CONTINUE
+        }
+
+        @Throws(IOException::class)
+        override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
+            copy(file, target.resolve(source.toPath().relativize(file)))
+            return FileVisitResult.CONTINUE
+        }
+    })
 }
 
 internal fun copyFiles(dir: File, projectDirectory: String, condition: (File) -> Boolean) {
@@ -54,22 +75,21 @@ internal fun createAllureResultsDirectory(projectDirectory: String) {
         directory.mkdir();
     } else {
         directory.listFiles().forEach {
-            it.delete()
+            if(it.isDirectory) it.deleteRecursively() else it.delete()
         }
     }
 }
 
-internal fun prepareVideoAttachments(mapper: ObjectMapper, videoAtt: List<JsonNode>) =
-    mapper.createObjectNode().apply {
+internal fun prepareVideoAttachments(mapper: ObjectMapper, videoAtt: List<JsonNode>): JsonNode {
+    val path = videoAtt.first()["source"].asText()
+    val separator = Paths.get(path).fileSystem.separator
+    return mapper.createObjectNode().apply {
         this.put("name", "Video")
         this.put(
             "source",
-            if(Os.isFamily(Os.FAMILY_WINDOWS)) {
-                videoAtt.first()["source"].asText().split("\\\\", "\\").last()
-            } else {
-               videoAtt.first()["source"].asText().split("/").last()
-            }
+            path.split("${ScreenRecordAttachment.directoryName}$separator").last()
         )
        this.put("type", ScreenRecordAttachment.allureType)
     }!!
+}
 
