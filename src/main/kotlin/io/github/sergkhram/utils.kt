@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.sergkhram.helpers.pforEach
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
+import org.gradle.api.logging.Logging
+import org.gradle.launcher.daemon.client.DaemonClientConnection
 import java.io.File
 import java.io.IOException
 import java.nio.file.*
@@ -12,6 +14,7 @@ import java.nio.file.Files.copy
 import java.nio.file.Files.createDirectories
 import java.nio.file.attribute.BasicFileAttributes
 
+val logger = Logging.getLogger(DaemonClientConnection::class.java)
 
 internal fun copyVideos(projectDirectory: String) {
     val marathonScreenRecordDirectory = "$projectDirectory/build/reports/marathon/${Configuration.buildType}AndroidTest/${ScreenRecordAttachment.directoryName}"
@@ -63,7 +66,7 @@ internal fun copyFiles(dir: File, projectDirectory: String, condition: (File) ->
 }
 
 internal fun File.copyFile(projectDirectory: String) {
-    Files.copy(
+    copy(
         Paths.get(this.path),
         Paths.get("$projectDirectory/build/allure-results/${this.name}")
     )

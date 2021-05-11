@@ -3,37 +3,32 @@ package io.github.sergkhram.enrich
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
-import io.github.sergkhram.CustomException
-import io.github.sergkhram.Configuration
-import io.github.sergkhram.copyFiles
-import io.github.sergkhram.copyVideos
+import io.github.sergkhram.*
 import io.github.sergkhram.helpers.*
-import io.github.sergkhram.helpers.isAppropriateMarathonResultFile
-import io.github.sergkhram.helpers.isResultJsonFile
-import io.github.sergkhram.helpers.pforEach
-import io.github.sergkhram.prepareVideoAttachments
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
 import java.io.File
 
 class MarathonEnrichService(
-        private val marathonAllureResDirectory: File,
-        private val mapper: ObjectMapper,
-        private val projectDirectory: String,
-        private val allureDeviceResDirectory: File
-): EnrichService {
+    private val marathonAllureResDirectory: File,
+    private val mapper: ObjectMapper,
+    private val projectDirectory: String,
+    private val allureDeviceResDirectory: File
+) : EnrichService {
 
     override fun iterableEnrich() {
         lateinit var listOfAllureDeviceJsonFiles: List<File>
         try {
+            logger.info("Loading allure json files")
             listOfAllureDeviceJsonFiles = allureDeviceResDirectory.listFiles()!!.filter { isResultJsonFile(it) }
         } catch (e: Exception) {
             throw CustomException("There is no $projectDirectory/build/reports/marathon/${Configuration.buildType}AndroidTest/allure-device-results directory. Check your buildType")
         }
         listOfAllureDeviceJsonFiles?.let {
-            if(it.size > 200) {
+            logger.debug("Count of allure device Json files ${it.size}")
+            if (it.size > 200) {
                 runBlocking(newFixedThreadPoolContext(it.size, "allure-results-enricher-pool")) {
-                    it.pforEach(this.coroutineContext) { deviceAllureFile->
+                    it.pforEach(this.coroutineContext) { deviceAllureFile ->
                         enrichByMarathonResultFile(deviceAllureFile)
                     }
                 }
@@ -66,12 +61,12 @@ class MarathonEnrichService(
     }
 
     private fun enrichByMarathonResultFile(
-            deviceAllureFile: File
+        deviceAllureFile: File
     ) {
+        logger.info("enrich allure file: ${deviceAllureFile.name}")
         var currentDeviceFile = deviceAllureFile.asJson(mapper)
         marathonAllureResDirectory.listFiles()?.first {
-            isResultJsonFile(it) &&
-                    isAppropriateMarathonResultFile(it, mapper, currentDeviceFile)
+            isResultJsonFile(it)
         }?.let { marathonAllureFile ->
             val currentMarathonFile = marathonAllureFile.asJson(mapper)
 

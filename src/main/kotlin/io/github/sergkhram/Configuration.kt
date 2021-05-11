@@ -16,10 +16,10 @@ object Configuration {
             throw CustomException("There is no chosen enrichVariant, only these values are supported : ${EnrichVariant.values()}")
         }
     }
-    val remoteAllureFolder: String by lazy { System.getProperty("remoteAllureFolder") ?: "sdcard/allure-results"}
+    val remoteAllureFolder: String by lazy { System.getProperty("remoteAllureFolder") ?: "/sdcard/allure-results"}
 }
 
-enum class EnrichVariant{
+enum class EnrichVariant {
     MARATHON,
     CLEAN_ALLURE
 }
