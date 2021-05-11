@@ -9,6 +9,7 @@ dependencies {
     implementation(gradleApi())
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
     implementation("com.malinskiy:adam:0.2.3")
+    gradleApi()
 }
 
 plugins {

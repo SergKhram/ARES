@@ -7,21 +7,23 @@ import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.AndroidDebugBridgeClientFactory
 import com.malinskiy.adam.interactor.StartAdbInteractor
 import com.malinskiy.adam.interactor.StopAdbInteractor
-import com.malinskiy.adam.request.Feature
 import com.malinskiy.adam.request.device.Device
 import com.malinskiy.adam.request.device.ListDevicesRequest
-import com.malinskiy.adam.request.sync.model.FileEntryV2
-import com.malinskiy.adam.request.sync.v2.ListFileRequest
-import com.malinskiy.adam.request.sync.v2.PullFileRequest
+import com.malinskiy.adam.request.sync.model.FileEntryV1
+import com.malinskiy.adam.request.sync.v1.ListFileRequest
+import com.malinskiy.adam.request.sync.v1.PullFileRequest
 import io.github.sergkhram.Configuration
+import io.github.sergkhram.CustomException
 import io.github.sergkhram.helpers.*
 import io.github.sergkhram.helpers.isJsonNoTheResult
 import io.github.sergkhram.helpers.isNotJson
 import io.github.sergkhram.helpers.isResultJson
 import io.github.sergkhram.helpers.pforEach
+import io.github.sergkhram.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
+import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -30,17 +32,65 @@ class CleanAllureEnrichService(
     private val projectDirectory: String
 ) : EnrichService {
 
+    private fun File.checkDirectoryExisting(): File? {
+        this.let {
+            return if(it.exists()) it else null
+        }
+    }
+
     override fun iterableEnrich() {
         runBlocking {
-            StartAdbInteractor().execute()
-            val adb = AndroidDebugBridgeClientFactory().build()
-            val devices: List<Device> = adb.execute(request = ListDevicesRequest())
-            devices.forEach { device ->
-                val list: List<FileEntryV2> = adb.execute(ListFileRequest(Configuration.remoteAllureFolder, listOf(Feature.LS_V2)), device.serial)
-                val listOfAllureDeviceJsonFiles = list.filter{ isResultJson(it.name!!) }
-                if(listOfAllureDeviceJsonFiles.size > 200) {
-                    runBlocking(newFixedThreadPoolContext(listOfAllureDeviceJsonFiles.size, "allure-results-enricher-pool")) {
-                        listOfAllureDeviceJsonFiles.pforEach(this.coroutineContext) {
+            val androidHome: File? = when {
+                Os.isFamily(Os.FAMILY_WINDOWS) -> {
+                    val user = System.getenv("USER") ?: System.getenv("USERNAME") ?: null
+                    user?.let {
+                        File("C:\\Users\\$it\\AppData\\Local\\Android\\Sdk").checkDirectoryExisting()
+                    }
+                }
+                Os.isFamily(Os.FAMILY_MAC) -> {
+                    val user = System.getenv("USER") ?: null
+                    user?.let {
+                        File("/Users/$user/Library/Android/sdk").checkDirectoryExisting()
+                    }
+                }
+                else -> {
+                    val home = System.getenv("HOME") ?: null
+                    home?.let {
+                        File("$it/Android/Sdk").checkDirectoryExisting()
+                    }
+                }
+            }
+            androidHome?.let {
+                logger.info("Android SDK directory is '$it'")
+            }
+            if(StartAdbInteractor().execute(androidHome = androidHome)) {
+                val adb = AndroidDebugBridgeClientFactory().build()
+                val devices: List<Device> = adb.execute(request = ListDevicesRequest())
+                devices.forEach { device ->
+                    logger.info("Transferring files from ${device.serial}")
+                    val list: List<FileEntryV1> = adb.execute(
+                        ListFileRequest(Configuration.remoteAllureFolder),
+                        device.serial
+                    )
+                    val listOfAllureDeviceJsonFiles = list.filter { isResultJson(it.name!!) }
+                    if (listOfAllureDeviceJsonFiles.size > 200) {
+                        runBlocking(
+                            newFixedThreadPoolContext(
+                                listOfAllureDeviceJsonFiles.size,
+                                "allure-results-enricher-pool"
+                            )
+                        ) {
+                            listOfAllureDeviceJsonFiles.pforEach(this.coroutineContext) {
+                                pullResultFilesWithEnrich(
+                                    this,
+                                    adb,
+                                    device,
+                                    it
+                                )
+                            }
+                        }
+                    } else {
+                        listOfAllureDeviceJsonFiles.forEach {
                             pullResultFilesWithEnrich(
                                 this,
                                 adb,
@@ -49,25 +99,21 @@ class CleanAllureEnrichService(
                             )
                         }
                     }
-                } else {
-                    listOfAllureDeviceJsonFiles.forEach {
-                        pullResultFilesWithEnrich(
-                            this,
-                            adb,
-                            device,
-                            it
-                        )
-                    }
+
+                    list.filter {
+                        it.isRegularFile() && (isNotJson(it.name!!) || isJsonNoTheResult(
+                            it.name!!
+                        ))
+                    }.copyOtherFiles(this, adb, device)
                 }
-
-                list.filter{ isNotJson(it.name!!) || isJsonNoTheResult(it.name!!) }.copyOtherFiles(this, adb, device)
+                StopAdbInteractor().execute()
+            } else {
+                throw CustomException("Check your ANDROID_HOME env")
             }
-            StopAdbInteractor().execute()
-
         }
     }
 
-    private suspend fun List<FileEntryV2>.copyOtherFiles(scope: CoroutineScope,
+    private suspend fun List<FileEntryV1>.copyOtherFiles(scope: CoroutineScope,
                                                          adb: AndroidDebugBridgeClient,
                                                          device: Device) {
         val files = this
@@ -87,12 +133,11 @@ class CleanAllureEnrichService(
     private suspend fun pullFile(scope: CoroutineScope,
                                  adb: AndroidDebugBridgeClient,
                                  device: Device,
-                                 file: FileEntryV2,
+                                 file: FileEntryV1,
                                  prefix: String = "") {
             val pullDevicesRequest = PullFileRequest(
                 "${Configuration.remoteAllureFolder}/${file.name}",
                 File("${projectDirectory}/build/allure-results/${prefix}${file.name}"),
-                listOf(Feature.SENDRECV_V2),
                 coroutineContext = scope.coroutineContext)
             val channel = adb.execute(
                 pullDevicesRequest,
@@ -103,11 +148,11 @@ class CleanAllureEnrichService(
             var percentage = 0
             for (percentageDouble in channel) {
                 percentage = (percentageDouble * 100).roundToInt()
-                println(percentage)
+                logger.info("Percentage: $percentage")
         }
     }
 
-    private suspend fun pullResultFilesWithEnrich(scope: CoroutineScope, adb: AndroidDebugBridgeClient, device: Device, file: FileEntryV2) {
+    private suspend fun pullResultFilesWithEnrich(scope: CoroutineScope, adb: AndroidDebugBridgeClient, device: Device, file: FileEntryV1) {
         pullFile(scope, adb, device, file, "temp-")
 
         var tempAllureResultFile = File("${projectDirectory}/build/allure-results/temp-${file.name}").asJson(mapper)
