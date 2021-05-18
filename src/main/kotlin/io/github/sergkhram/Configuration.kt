@@ -17,6 +17,10 @@ object Configuration {
         }
     }
     val remoteAllureFolder: String by lazy { System.getProperty("remoteAllureFolder") ?: "/sdcard/allure-results"}
+    val isMarathonCLI: Boolean by lazy {
+        System.getProperty("isMarathonCLI")?.toBoolean() ?: false
+    }
+    val testDirectory = if(isMarathonCLI) "" else "${buildType}AndroidTest/"
 }
 
 enum class EnrichVariant {

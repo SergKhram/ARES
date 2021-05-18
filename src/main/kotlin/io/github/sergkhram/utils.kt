@@ -6,7 +6,6 @@ import io.github.sergkhram.helpers.pforEach
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.logging.Logging
-import org.gradle.launcher.daemon.client.DaemonClientConnection
 import java.io.File
 import java.io.IOException
 import java.nio.file.*
@@ -14,10 +13,11 @@ import java.nio.file.Files.copy
 import java.nio.file.Files.createDirectories
 import java.nio.file.attribute.BasicFileAttributes
 
-val logger = Logging.getLogger(DaemonClientConnection::class.java)
+val logger = Logging.getLogger(AresPlugin::class.java)
 
 internal fun copyVideos(projectDirectory: String) {
-    val marathonScreenRecordDirectory = "$projectDirectory/build/reports/marathon/${Configuration.buildType}AndroidTest/${ScreenRecordAttachment.directoryName}"
+    logger.info("Transferring videos")
+    val marathonScreenRecordDirectory = "$projectDirectory/build/reports/marathon/${Configuration.testDirectory}${ScreenRecordAttachment.directoryName}"
     try {
         File(
             marathonScreenRecordDirectory
@@ -52,7 +52,13 @@ internal fun copyFiles(dir: File, projectDirectory: String, condition: (File) ->
     val listOfAllureFiles = dir.listFiles()!!.filter { it.isFile && condition(it) }
     listOfAllureFiles?.let {
         if (it.size > 500) {
-            runBlocking(newFixedThreadPoolContext(it.size, "allure-files-copier-pool-${condition.toString()}")) {
+            logger.debug("Parallel $condition files transferring")
+            runBlocking(
+                newFixedThreadPoolContext(
+                    it.size,
+                    "allure-files-copier-pool-${condition.toString()}"
+                )
+            ) {
                 it.pforEach(this.coroutineContext) { file ->
                     file.copyFile(projectDirectory)
                 }
@@ -73,9 +79,9 @@ internal fun File.copyFile(projectDirectory: String) {
 }
 
 internal fun createAllureResultsDirectory(projectDirectory: String) {
-    val directory = File("$projectDirectory/build/allure-results");
+    val directory = File("$projectDirectory/build/allure-results")
     if (!directory.exists()) {
-        directory.mkdir();
+        directory.mkdir()
     } else {
         directory.listFiles().forEach {
             if(it.isDirectory) it.deleteRecursively() else it.delete()
@@ -96,3 +102,26 @@ internal fun prepareVideoAttachments(mapper: ObjectMapper, videoAtt: List<JsonNo
     }!!
 }
 
+fun progressPercentage(done: Int, total: Int, fileName: String) {
+    val size = 20
+    val iconLeftBoundary = "["
+    val iconDone = "="
+    val iconRemain = "."
+    val iconRightBoundary = "]"
+    require(done <= total)
+    val donePercents = 100 * done / total
+    val doneLength = size * donePercents / 100
+    val bar = StringBuilder(iconLeftBoundary)
+    for (i in 0 until size) {
+        if (i < doneLength) {
+            bar.append(iconDone)
+        } else {
+            bar.append(iconRemain)
+        }
+    }
+    bar.append(iconRightBoundary)
+    logger.info("\r[$fileName] $bar $donePercents%")
+    if (done == total) {
+        logger.info("\n")
+    }
+}
