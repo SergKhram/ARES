@@ -3,6 +3,10 @@ package io.github.sergkhram.enrich
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.malinskiy.adam.AndroidDebugBridgeClientFactory
+import com.malinskiy.adam.interactor.StartAdbInteractor
+import com.malinskiy.adam.interactor.StopAdbInteractor
+import com.malinskiy.adam.request.shell.v1.ShellCommandRequest
 import io.github.sergkhram.*
 import io.github.sergkhram.helpers.*
 import kotlinx.coroutines.newFixedThreadPoolContext
@@ -15,6 +19,7 @@ class MarathonEnrichService(
     private val projectDirectory: String,
     private val allureDeviceResDirectory: File
 ) : EnrichService {
+    val devicesInfo = mutableMapOf<String, String?>()
 
     override fun iterableEnrich() {
         logger.info("Getting results from Marathon")
@@ -92,6 +97,15 @@ class MarathonEnrichService(
                 mapper.createRealHostTag(realHost)
             )
 
+            prepareModelBySerial(realHost["value"].asText())
+
+            devicesInfo[realHost["value"].asText()]?.let {
+                (currentDeviceFile["labels"] as ArrayNode).add(
+                        mapper.createModelTag(it)
+                )
+            }
+
+
             File("$projectDirectory/build/allure-results/${deviceAllureFile.name}").apply {
                 this.setWritable(true)
                 this.writeText(
@@ -100,6 +114,34 @@ class MarathonEnrichService(
                         .writeValueAsString(currentDeviceFile)
                 )
             }
+        }
+    }
+
+    fun prepareModelBySerial(serial: String) {
+        if(!devicesInfo.containsKey(serial)) {
+            var model: String? = null
+
+            runBlocking {
+                try {
+                    androidHome?.let {
+                        logger.info("Android SDK directory is '$it'")
+                    }
+                    if(StartAdbInteractor().execute(androidHome = androidHome)) {
+                        logger.debug("Starting adb client factory")
+                        val adb = AndroidDebugBridgeClientFactory().build()
+                        val output = adb.execute(ShellCommandRequest("getprop ro.product.model"), serial).output
+                        model = if(!output.isNullOrBlank()) output else null
+                    }
+                } catch (e: Exception) {
+                    logger.debug(e.message)
+                }
+                try {
+                    StopAdbInteractor().execute()
+                } catch (e: Exception) {
+                    logger.debug(e.message)
+                }
+            }
+            devicesInfo.put(serial, model)
         }
     }
 }

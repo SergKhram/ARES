@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.sergkhram.helpers.pforEach
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.logging.Logging
 import java.io.File
 import java.io.IOException
@@ -123,5 +124,32 @@ fun progressPercentage(done: Int, total: Int, fileName: String) {
     logger.info("\r[$fileName] $bar $donePercents%")
     if (done == total) {
         logger.info("\n")
+    }
+}
+
+fun File.checkDirectoryExisting(): File? {
+    this.let {
+        return if(it.exists()) it else null
+    }
+}
+
+val androidHome: File? = when {
+    Os.isFamily(Os.FAMILY_WINDOWS) -> {
+        val user = System.getenv("USER") ?: System.getenv("USERNAME") ?: null
+        user?.let {
+            File("C:\\Users\\$it\\AppData\\Local\\Android\\Sdk").checkDirectoryExisting()
+        }
+    }
+    Os.isFamily(Os.FAMILY_MAC) -> {
+        val user = System.getenv("USER") ?: null
+        user?.let {
+            File("/Users/$user/Library/Android/sdk").checkDirectoryExisting()
+        }
+    }
+    else -> {
+        val home = System.getenv("HOME") ?: null
+        home?.let {
+            File("$it/Android/Sdk").checkDirectoryExisting()
+        }
     }
 }

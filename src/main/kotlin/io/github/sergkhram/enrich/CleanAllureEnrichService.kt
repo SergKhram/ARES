@@ -9,22 +9,19 @@ import com.malinskiy.adam.interactor.StartAdbInteractor
 import com.malinskiy.adam.interactor.StopAdbInteractor
 import com.malinskiy.adam.request.device.Device
 import com.malinskiy.adam.request.device.ListDevicesRequest
+import com.malinskiy.adam.request.shell.v1.ShellCommandRequest
 import com.malinskiy.adam.request.sync.model.FileEntryV1
 import com.malinskiy.adam.request.sync.v1.ListFileRequest
 import com.malinskiy.adam.request.sync.v1.PullFileRequest
-import io.github.sergkhram.Configuration
-import io.github.sergkhram.CustomException
+import io.github.sergkhram.*
 import io.github.sergkhram.helpers.*
 import io.github.sergkhram.helpers.isJsonNoTheResult
 import io.github.sergkhram.helpers.isNotJson
 import io.github.sergkhram.helpers.isResultJson
 import io.github.sergkhram.helpers.pforEach
-import io.github.sergkhram.logger
-import io.github.sergkhram.progressPercentage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
-import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -33,35 +30,11 @@ class CleanAllureEnrichService(
     private val projectDirectory: String
 ) : EnrichService {
 
-    private fun File.checkDirectoryExisting(): File? {
-        this.let {
-            return if(it.exists()) it else null
-        }
-    }
+    val devicesInfo = mutableMapOf<String, String?>()
 
     override fun iterableEnrich() {
         logger.info("Getting results from device")
         runBlocking {
-            val androidHome: File? = when {
-                Os.isFamily(Os.FAMILY_WINDOWS) -> {
-                    val user = System.getenv("USER") ?: System.getenv("USERNAME") ?: null
-                    user?.let {
-                        File("C:\\Users\\$it\\AppData\\Local\\Android\\Sdk").checkDirectoryExisting()
-                    }
-                }
-                Os.isFamily(Os.FAMILY_MAC) -> {
-                    val user = System.getenv("USER") ?: null
-                    user?.let {
-                        File("/Users/$user/Library/Android/sdk").checkDirectoryExisting()
-                    }
-                }
-                else -> {
-                    val home = System.getenv("HOME") ?: null
-                    home?.let {
-                        File("$it/Android/Sdk").checkDirectoryExisting()
-                    }
-                }
-            }
             androidHome?.let {
                 logger.info("Android SDK directory is '$it'")
             }
@@ -70,6 +43,10 @@ class CleanAllureEnrichService(
                 val adb = AndroidDebugBridgeClientFactory().build()
                 val devices: List<Device> = adb.execute(request = ListDevicesRequest())
                 logger.info("Found devices: ${devices.map {it.serial}}")
+                devices.forEach {
+                    val output = adb.execute(ShellCommandRequest("getprop ro.product.model"), it.serial).output
+                    devicesInfo.put(it.serial, if(!output.isNullOrBlank()) output else null)
+                }
                 devices.forEach { device ->
                     logger.info("Transferring Json files from ${device.serial}")
                     val list: List<FileEntryV1> = adb.execute(
@@ -178,6 +155,11 @@ class CleanAllureEnrichService(
         (tempAllureResultFile["labels"] as ArrayNode).add(
             mapper.createRealHostTag(realHost)
         )
+        devicesInfo[device.serial]?.let {
+            (tempAllureResultFile["labels"] as ArrayNode).add(
+                    mapper.createModelTag(devicesInfo[device.serial]!!)
+            )
+        }
 
         File("$projectDirectory/build/allure-results/${file.name}").apply {
             this.setWritable(true)

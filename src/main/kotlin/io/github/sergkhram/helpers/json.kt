@@ -31,3 +31,7 @@ fun ObjectMapper.createRealHostTag(realHost: JsonNode) = this.createObjectNode()
 
 fun JsonNode.getStartTime() = this["start"].asLong()
 fun JsonNode.getStopTime() = this["stop"].asLong()
+
+fun ObjectMapper.createModelTag(modelName: String) = this.createObjectNode()
+        .put("name", "tag")
+        .put("value", "model-${modelName.trim()}")
