@@ -35,8 +35,8 @@ plugins {
 > *SCREENSHOT* and *VIDEO* (default is *SCREENSHOT*, also for empty screenRecordType property).
 > *SCREENSHOT* is for *GIF*, *VIDEO* is for *MP4*.
 > - **buildType** is needed when you have more then two build types and variants (default is *debug*)
-> - **enrichVariant** is needed to choose variant of getting allure-results. There are two options:
-> *MARATHON* and *CLEAN_ALLURE* (default is *MARATHON*, also for empty enrichVariant property).
+> - **enrichBy** is needed to choose variant of getting allure-results. There are two options:
+> *MARATHON* and *CLEAN_ALLURE* (default is *MARATHON*, also for empty enrichBy property).
 > *MARATHON* is for getting from marathon orchestrator report, *CLEAN_ALLURE* is just for pulling results from device with data enrichment.
 > - **remoteAllureFolder** is needed to set path of device allure-results directory (default is ```sdcard/allure-results```, also for empty remoteAllureFolder property).
-> It's only for **enrichVariant**=*CLEAN_ALLURE*
+> It's only for **enrichBy**=*CLEAN_ALLURE*

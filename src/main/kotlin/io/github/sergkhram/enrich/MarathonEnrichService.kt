@@ -8,6 +8,7 @@ import com.malinskiy.adam.interactor.StartAdbInteractor
 import com.malinskiy.adam.interactor.StopAdbInteractor
 import com.malinskiy.adam.request.shell.v1.ShellCommandRequest
 import io.github.sergkhram.*
+import io.github.sergkhram.configuration.Configuration
 import io.github.sergkhram.helpers.*
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
@@ -19,7 +20,7 @@ class MarathonEnrichService(
     private val projectDirectory: String,
     private val allureDeviceResDirectory: File
 ) : EnrichService {
-    val devicesInfo = mutableMapOf<String, String?>()
+    val devicesInfo = mutableMapOf<String, DeviceInfo?>()
 
     override fun iterableEnrich() {
         logger.info("Getting results from Marathon")
@@ -28,7 +29,7 @@ class MarathonEnrichService(
             logger.info("Loading allure json files")
             listOfAllureDeviceJsonFiles = allureDeviceResDirectory.listFiles()!!.filter { isResultJsonFile(it) }
         } catch (e: Exception) {
-            throw CustomException("There is no $projectDirectory/build/reports/marathon/${Configuration.testDirectory}allure-device-results directory. Check your buildType")
+            throw CustomException("There is no ${Configuration.getReportDirectory(projectDirectory)}allure-device-results directory. Check your buildType")
         }
         listOfAllureDeviceJsonFiles?.let {
             logger.debug("Count of allure device Json files ${it.size}")
@@ -54,17 +55,20 @@ class MarathonEnrichService(
         copyFiles(
             allureDeviceResDirectory,
             projectDirectory,
-            isNotJsonFile
+            isNotJsonFile,
+            "is not json"
         )
         copyFiles(
             marathonAllureResDirectory,
             projectDirectory,
-            isEnvironmentFile
+            isEnvironmentFile,
+            "is environment"
         )
         copyFiles(
             marathonAllureResDirectory,
             projectDirectory,
-            isJsonNotTheResultFile
+            isJsonNotTheResultFile,
+        "is json not the result"
         )
     }
 
@@ -97,14 +101,20 @@ class MarathonEnrichService(
                 mapper.createRealHostTag(realHost)
             )
 
-            prepareModelBySerial(realHost["value"].asText())
+            prepareDeviceInfoBySerial(realHost["value"].asText())
 
-            devicesInfo[realHost["value"].asText()]?.let {
-                (currentDeviceFile["labels"] as ArrayNode).add(
+            devicesInfo[realHost["value"].asText()]?.let { deviceInfo ->
+                deviceInfo.model?.let {
+                    (currentDeviceFile["labels"] as ArrayNode).add(
                         mapper.createModelTag(it)
-                )
+                    )
+                }
+                deviceInfo.osVersion?.let {
+                    (currentDeviceFile["labels"] as ArrayNode).add(
+                        mapper.createOsVersionTag(it)
+                    )
+                }
             }
-
 
             File("$projectDirectory/build/allure-results/${deviceAllureFile.name}").apply {
                 this.setWritable(true)
@@ -117,9 +127,9 @@ class MarathonEnrichService(
         }
     }
 
-    fun prepareModelBySerial(serial: String) {
+    fun prepareDeviceInfoBySerial(serial: String) {
         if(!devicesInfo.containsKey(serial)) {
-            var model: String? = null
+            var deviceInfo: DeviceInfo? = null
 
             runBlocking {
                 try {
@@ -129,19 +139,20 @@ class MarathonEnrichService(
                     if(StartAdbInteractor().execute(androidHome = androidHome)) {
                         logger.debug("Starting adb client factory")
                         val adb = AndroidDebugBridgeClientFactory().build()
-                        val output = adb.execute(ShellCommandRequest("getprop ro.product.model"), serial).output
-                        model = if(!output.isNullOrBlank()) output else null
+                        val model = adb.execute(ShellCommandRequest("getprop ro.product.model"), serial).output
+                        val osVersion = adb.execute(ShellCommandRequest("getprop ro.build.version.sdk"), serial).output
+                        deviceInfo = if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) DeviceInfo(model, osVersion) else null
                     }
                 } catch (e: Exception) {
-                    logger.debug(e.message)
+                    logger.debug(e.message ?: e.localizedMessage)
                 }
                 try {
                     StopAdbInteractor().execute()
                 } catch (e: Exception) {
-                    logger.debug(e.message)
+                    logger.debug(e.message ?: e.localizedMessage)
                 }
             }
-            devicesInfo.put(serial, model)
+            devicesInfo.put(serial, deviceInfo)
         }
     }
 }

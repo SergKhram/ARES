@@ -14,6 +14,7 @@ import com.malinskiy.adam.request.sync.model.FileEntryV1
 import com.malinskiy.adam.request.sync.v1.ListFileRequest
 import com.malinskiy.adam.request.sync.v1.PullFileRequest
 import io.github.sergkhram.*
+import io.github.sergkhram.configuration.Configuration
 import io.github.sergkhram.helpers.*
 import io.github.sergkhram.helpers.isJsonNoTheResult
 import io.github.sergkhram.helpers.isNotJson
@@ -29,8 +30,7 @@ class CleanAllureEnrichService(
     private val mapper: ObjectMapper,
     private val projectDirectory: String
 ) : EnrichService {
-
-    val devicesInfo = mutableMapOf<String, String?>()
+    val devicesInfo = mutableMapOf<String, DeviceInfo?>()
 
     override fun iterableEnrich() {
         logger.info("Getting results from device")
@@ -43,11 +43,14 @@ class CleanAllureEnrichService(
                 val adb = AndroidDebugBridgeClientFactory().build()
                 val devices: List<Device> = adb.execute(request = ListDevicesRequest())
                 logger.info("Found devices: ${devices.map {it.serial}}")
-                devices.forEach {
-                    val output = adb.execute(ShellCommandRequest("getprop ro.product.model"), it.serial).output
-                    devicesInfo.put(it.serial, if(!output.isNullOrBlank()) output else null)
+                val neededDeviceSerials = Configuration.deviceSerials?.split(",") ?: emptyList<String>()
+                val filteredDevices = if(neededDeviceSerials.isNotEmpty()) devices.filter { neededDeviceSerials.contains(it.serial) } else devices
+                filteredDevices.forEach {
+                    val model = adb.execute(ShellCommandRequest("getprop ro.product.model"), it.serial).output
+                    val osVersion = adb.execute(ShellCommandRequest("getprop ro.build.version.sdk"), it.serial).output
+                    devicesInfo.put(it.serial, if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) DeviceInfo(model, osVersion) else null)
                 }
-                devices.forEach { device ->
+                filteredDevices.forEach { device ->
                     logger.info("Transferring Json files from ${device.serial}")
                     val list: List<FileEntryV1> = adb.execute(
                         ListFileRequest(Configuration.remoteAllureFolder),
@@ -155,10 +158,17 @@ class CleanAllureEnrichService(
         (tempAllureResultFile["labels"] as ArrayNode).add(
             mapper.createRealHostTag(realHost)
         )
-        devicesInfo[device.serial]?.let {
-            (tempAllureResultFile["labels"] as ArrayNode).add(
-                    mapper.createModelTag(devicesInfo[device.serial]!!)
-            )
+        devicesInfo[device.serial]?.let { deviceInfo ->
+            deviceInfo.model?.let {
+                (tempAllureResultFile["labels"] as ArrayNode).add(
+                        mapper.createModelTag(it)
+                )
+            }
+            deviceInfo.osVersion?.let {
+                (tempAllureResultFile["labels"] as ArrayNode).add(
+                        mapper.createOsVersionTag(it)
+                )
+            }
         }
 
         File("$projectDirectory/build/allure-results/${file.name}").apply {

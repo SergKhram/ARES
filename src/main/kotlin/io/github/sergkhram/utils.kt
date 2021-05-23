@@ -2,11 +2,14 @@ package io.github.sergkhram
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.github.sergkhram.configuration.Configuration
+import io.github.sergkhram.configuration.ScreenRecordAttachment
+import io.github.sergkhram.helpers.AresLogger
+import io.github.sergkhram.helpers.CustomException
 import io.github.sergkhram.helpers.pforEach
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
 import org.apache.tools.ant.taskdefs.condition.Os
-import org.gradle.api.logging.Logging
 import java.io.File
 import java.io.IOException
 import java.nio.file.*
@@ -14,11 +17,11 @@ import java.nio.file.Files.copy
 import java.nio.file.Files.createDirectories
 import java.nio.file.attribute.BasicFileAttributes
 
-val logger = Logging.getLogger(AresPlugin::class.java)
+val logger = AresLogger(AresPlugin::class.java)
 
 internal fun copyVideos(projectDirectory: String) {
     logger.info("Transferring videos")
-    val marathonScreenRecordDirectory = "$projectDirectory/build/reports/marathon/${Configuration.testDirectory}${ScreenRecordAttachment.directoryName}"
+    val marathonScreenRecordDirectory = "${Configuration.getReportDirectory(projectDirectory)}${ScreenRecordAttachment.directoryName}"
     try {
         File(
             marathonScreenRecordDirectory
@@ -49,11 +52,11 @@ fun File.copyFolder(projectDirectory: String) {
     })
 }
 
-internal fun copyFiles(dir: File, projectDirectory: String, condition: (File) -> Boolean) {
+internal fun copyFiles(dir: File, projectDirectory: String, condition: (File) -> Boolean, description: String) {
     val listOfAllureFiles = dir.listFiles()!!.filter { it.isFile && condition(it) }
     listOfAllureFiles?.let {
         if (it.size > 500) {
-            logger.debug("Parallel $condition files transferring")
+            logger.debug("Parallel $description files transferring")
             runBlocking(
                 newFixedThreadPoolContext(
                     it.size,
@@ -81,10 +84,14 @@ internal fun File.copyFile(projectDirectory: String) {
 
 internal fun createAllureResultsDirectory(projectDirectory: String) {
     val directory = File("$projectDirectory/build/allure-results")
+    recursivelyDelete(directory)
+}
+
+internal fun recursivelyDelete(directory: File) {
     if (!directory.exists()) {
         directory.mkdir()
     } else {
-        directory.listFiles().forEach {
+        directory.listFiles()?.forEach {
             if(it.isDirectory) it.deleteRecursively() else it.delete()
         }
     }
@@ -121,7 +128,7 @@ fun progressPercentage(done: Int, total: Int, fileName: String) {
         }
     }
     bar.append(iconRightBoundary)
-    logger.info("\r[$fileName] $bar $donePercents%")
+    logger.info("[$fileName] $bar $donePercents%")
     if (done == total) {
         logger.info("\n")
     }
