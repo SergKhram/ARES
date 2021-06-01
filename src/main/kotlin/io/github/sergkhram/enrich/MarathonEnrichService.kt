@@ -3,10 +3,6 @@ package io.github.sergkhram.enrich
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.malinskiy.adam.AndroidDebugBridgeClientFactory
-import com.malinskiy.adam.interactor.StartAdbInteractor
-import com.malinskiy.adam.interactor.StopAdbInteractor
-import com.malinskiy.adam.request.shell.v1.ShellCommandRequest
 import io.github.sergkhram.*
 import io.github.sergkhram.configuration.Configuration
 import io.github.sergkhram.helpers.*
@@ -105,14 +101,10 @@ class MarathonEnrichService(
 
             devicesInfo[realHost["value"].asText()]?.let { deviceInfo ->
                 deviceInfo.model?.let {
-                    (currentDeviceFile["labels"] as ArrayNode).add(
-                        mapper.createModelTag(it)
-                    )
+                    (currentDeviceFile["labels"] as ArrayNode).add(mapper.createModelTag(it))
                 }
                 deviceInfo.osVersion?.let {
-                    (currentDeviceFile["labels"] as ArrayNode).add(
-                        mapper.createOsVersionTag(it)
-                    )
+                    (currentDeviceFile["labels"] as ArrayNode).add(mapper.createOsVersionTag(it))
                 }
             }
 
@@ -132,22 +124,24 @@ class MarathonEnrichService(
             var deviceInfo: DeviceInfo? = null
 
             runBlocking {
+                var adb: AdbManager? = null
                 try {
                     androidHome?.let {
                         logger.info("Android SDK directory is '$it'")
                     }
-                    if(StartAdbInteractor().execute(androidHome = androidHome)) {
+                    adb = AdbManager(androidHome)
+                    if(adb.startAdb()) {
                         logger.debug("Starting adb client factory")
-                        val adb = AndroidDebugBridgeClientFactory().build()
-                        val model = adb.execute(ShellCommandRequest("getprop ro.product.model"), serial).output
-                        val osVersion = adb.execute(ShellCommandRequest("getprop ro.build.version.sdk"), serial).output
+                        adb.initAdbClient()
+                        val model = adb.getModel(serial)
+                        val osVersion = adb.getOsVersion(serial)
                         deviceInfo = if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) DeviceInfo(model, osVersion) else null
                     }
                 } catch (e: Exception) {
                     logger.debug(e.message ?: e.localizedMessage)
                 }
                 try {
-                    StopAdbInteractor().execute()
+                    adb?.stopAdb()
                 } catch (e: Exception) {
                     logger.debug(e.message ?: e.localizedMessage)
                 }
