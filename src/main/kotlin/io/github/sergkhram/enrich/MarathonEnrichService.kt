@@ -73,15 +73,19 @@ class MarathonEnrichService(
     ) {
         logger.info("Enriching allure file: ${deviceAllureFile.name}")
         var currentDeviceFile = deviceAllureFile.asJson(mapper)
-        marathonAllureResDirectory.listFiles()?.first {
+        val marathonAllureFile = marathonAllureResDirectory.listFiles()?.firstOrNull {
             isResultJsonFile(it) &&
             isAppropriateMarathonResultFile(it, mapper, currentDeviceFile)
-        }?.let { marathonAllureFile ->
+        }
+        if(marathonAllureFile != null) {
             val currentMarathonFile = marathonAllureFile.asJson(mapper)
 
             val videoAttachments = currentMarathonFile.getVideoAttachments()
 
             if (videoAttachments.isNotEmpty()) {
+                if(currentDeviceFile["attachments"] == null) {
+                    (currentDeviceFile as ObjectNode).put("attachments", mapper.createArrayNode())
+                }
                 (currentDeviceFile["attachments"] as ArrayNode).add(
                     prepareVideoAttachments(mapper, videoAttachments)
                 )
@@ -107,7 +111,16 @@ class MarathonEnrichService(
                     (currentDeviceFile["labels"] as ArrayNode).add(mapper.createOsVersionTag(it))
                 }
             }
-
+            File("$projectDirectory/build/allure-results/${deviceAllureFile.name}").apply {
+                this.setWritable(true)
+                this.writeText(
+                    mapper
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(currentDeviceFile)
+                )
+            }
+        } else {
+            logger.info("Didn't find marathon file is appropriate to current allure-device-file ${deviceAllureFile.name}")
             File("$projectDirectory/build/allure-results/${deviceAllureFile.name}").apply {
                 this.setWritable(true)
                 this.writeText(
