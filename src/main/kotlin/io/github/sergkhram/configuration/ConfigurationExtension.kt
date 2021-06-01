@@ -3,6 +3,7 @@ package io.github.sergkhram.configuration
 import groovy.lang.Closure
 import io.github.sergkhram.helpers.CustomException
 import org.gradle.api.Project
+import java.lang.IllegalArgumentException
 
 open class ConfigurationExtension(project: Project) {
     var marathonBlock: MarathonBlock? = null
@@ -34,12 +35,12 @@ fun ConfigurationExtension.provideConfiguration() {
     Configuration.buildType = System.getProperty("buildType")?.toString() ?: this.marathonBlock?.buildType ?: "debug"
     Configuration.screenRecordType = try {
         ScreenRecordType.valueOf(System.getProperty("screenRecordType")?.toString() ?: this.marathonBlock?.screenRecordType ?: "SCREENSHOT")
-    } catch (e: Exception) {
+    } catch (e: IllegalArgumentException) {
         throw CustomException("There is no chosen screenRecordType, only these values are supported : ${ScreenRecordType.values()}")
     }
     Configuration.enrichBy = try {
         EnrichVariant.valueOf(System.getProperty("enrichBy")?.toString() ?: this.enrichBy ?: "MARATHON")
-    } catch (e: Exception) {
+    } catch (e: IllegalArgumentException) {
         throw CustomException("There is no chosen enrichBy variant, only these values are supported : ${EnrichVariant.values()}")
     }
     Configuration.isMarathonCLI = System.getProperty("isMarathonCLI")?.toBoolean() ?: this.marathonBlock?.marathonCLI ?: false
