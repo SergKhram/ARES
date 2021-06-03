@@ -55,11 +55,11 @@ fun File.copyFolder(projectDirectory: String) {
 internal fun copyFiles(dir: File, projectDirectory: String, condition: (File) -> Boolean, description: String) {
     val listOfAllureFiles = dir.listFiles()!!.filter { it.isFile && condition(it) }
     listOfAllureFiles?.let {
-        if (it.size > 500) {
+        if (it.size > Configuration.startAsyncOtherFilesTransferFrom) {
             logger.debug("Parallel $description files transferring")
             runBlocking(
                 newFixedThreadPoolContext(
-                    it.size,
+                    Configuration.asyncFilesTransferThreadsCount,
                     "allure-files-copier-pool-${condition.toString()}"
                 )
             ) {

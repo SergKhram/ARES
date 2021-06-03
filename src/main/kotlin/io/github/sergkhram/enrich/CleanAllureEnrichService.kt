@@ -60,8 +60,8 @@ class CleanAllureEnrichService(
                                                          device: Device) {
         val files = this
         logger.debug("Count of allure device other files ${files.size}")
-        if(files.size > 500) {
-            runBlocking(newFixedThreadPoolContext(this.size, "allure-files-copier-pool")) {
+        if(files.size > Configuration.startAsyncOtherFilesTransferFrom) {
+            runBlocking(newFixedThreadPoolContext(Configuration.asyncFilesTransferThreadsCount, "allure-files-copier-pool")) {
                 logger.debug("Parallel files transferring")
                 files.pforEach(this.coroutineContext) {
                     pullFile(this, adb, device, it)
@@ -139,10 +139,10 @@ class CleanAllureEnrichService(
         val list: List<FileEntryV1> = adb.getFileList(device.serial) ?: listOf<FileEntryV1>()
         val listOfAllureDeviceJsonFiles = list.filter { isResultJson(it.name!!) }
         logger.debug("Count of allure device Json files ${listOfAllureDeviceJsonFiles.size}")
-        if (listOfAllureDeviceJsonFiles.size > 200) {
+        if (listOfAllureDeviceJsonFiles.size > Configuration.startAsyncResultFilesTransferFrom) {
             runBlocking(
                 newFixedThreadPoolContext(
-                    listOfAllureDeviceJsonFiles.size,
+                    Configuration.asyncFilesTransferThreadsCount,
                     "allure-results-enricher-pool"
                 )
             ) {

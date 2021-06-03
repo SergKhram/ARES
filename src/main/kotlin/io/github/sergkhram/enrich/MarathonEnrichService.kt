@@ -29,8 +29,8 @@ class MarathonEnrichService(
         }
         listOfAllureDeviceJsonFiles?.let {
             logger.debug("Count of allure device Json files ${it.size}")
-            if (it.size > 200) {
-                runBlocking(newFixedThreadPoolContext(it.size, "allure-results-enricher-pool")) {
+            if (it.size > Configuration.startAsyncResultFilesTransferFrom) {
+                runBlocking(newFixedThreadPoolContext(Configuration.asyncFilesTransferThreadsCount, "allure-results-enricher-pool")) {
                     logger.debug("Parallel files transferring")
                     it.pforEach(this.coroutineContext) { deviceAllureFile ->
                         enrichByMarathonResultFile(deviceAllureFile)
