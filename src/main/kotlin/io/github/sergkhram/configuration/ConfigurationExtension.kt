@@ -3,12 +3,14 @@ package io.github.sergkhram.configuration
 import groovy.lang.Closure
 import io.github.sergkhram.helpers.CustomException
 import org.gradle.api.Project
-import java.lang.IllegalArgumentException
 
 open class ConfigurationExtension(project: Project) {
     var marathonBlock: MarathonBlock? = null
     var allureBlock: AllureBlock? = null
     var enrichBy: String? = null
+    var startAsyncResultFilesTransferFrom: Int = 200
+    var startAsyncOtherFilesTransferFrom: Int = 500
+    var asyncFilesTransferThreadsCount: Int = 10
 
     fun marathonBlock(block: MarathonBlock.() -> Unit) {
         marathonBlock = MarathonBlock().also(block)
@@ -47,4 +49,21 @@ fun ConfigurationExtension.provideConfiguration() {
     Configuration.remoteAllureFolder = System.getProperty("remoteAllureFolder") ?: this.allureBlock?.remoteAllureFolder ?: "/sdcard/allure-results"
     Configuration.reportDirectory = System.getProperty("reportDirectory")?.toString() ?: this.marathonBlock?.reportDirectory
     Configuration.deviceSerials = System.getProperty("deviceSerials")?.toString() ?: this.allureBlock?.deviceSerials
+    Configuration.startAsyncResultFilesTransferFrom =
+        initAsyncFilesTransferring("startAsyncResultFilesTransferFrom", this.startAsyncResultFilesTransferFrom)
+    Configuration.startAsyncOtherFilesTransferFrom =
+        initAsyncFilesTransferring("startAsyncOtherFilesTransferFrom", this.startAsyncOtherFilesTransferFrom)
+    Configuration.asyncFilesTransferThreadsCount =
+        initAsyncFilesTransferring("asyncFilesTransferThreadsCount", this.asyncFilesTransferThreadsCount)
+}
+
+private fun initAsyncFilesTransferring(propertyName: String, defaultValue: Int): Int {
+    val valueFromSystemProperty: Int? = System.getProperty(propertyName)?.toInt()
+    if (valueFromSystemProperty != null) {
+        if (valueFromSystemProperty < 1) {
+            throw CustomException("Incorrect count for ${propertyName} : ${valueFromSystemProperty}")
+        }
+        return valueFromSystemProperty
+    }
+    return defaultValue;
 }
