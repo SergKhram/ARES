@@ -48,7 +48,7 @@ plugins {
 > - **startAsyncOtherFilesTransferFrom** is the value of allure other
 > files count(not the *-result.json, like attachments) from which is needed to use parallel transferring (the default is 500)
 > - **asyncFilesTransferThreadsCount** is the value of threads count, that will be used for parallel
-> transferring in case of **startAsyncResultFilesTransferFrom** or **startAsyncOtherFilesTransferFrom** (the dafeult is 10)
+> transferring in case of **startAsyncResultFilesTransferFrom** or **startAsyncOtherFilesTransferFrom** (the default is 10)
 ## ARES extension
 You can use ```ares {...}``` in your build.gradle(:app) and set the configuration as extension. For example:
 ```
