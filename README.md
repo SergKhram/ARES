@@ -19,7 +19,7 @@ repositories {
 }
 ```
 ```
-implementation 'io.github.sergkhram:ares-plugin:1.0.2-RELEASE'
+implementation 'io.github.sergkhram:ares-plugin:1.1.0-RELEASE'
 ```
 ```
 plugins {
