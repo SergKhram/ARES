@@ -60,7 +60,7 @@ internal fun copyFiles(dir: File, projectDirectory: String, condition: (File) ->
             runBlocking(
                 newFixedThreadPoolContext(
                     Configuration.asyncFilesTransferThreadsCount,
-                    "allure-files-copier-pool-${condition.toString()}"
+                    "allure-files-copier-pool-${description}"
                 )
             ) {
                 it.pforEach(this.coroutineContext) { file ->
