@@ -1,4 +1,4 @@
-package io.github.sergkhram
+package io.github.sergkhram.helpers
 
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Deferred
