@@ -29,7 +29,7 @@ plugins {
 
 
 ## Tasks
-> - **reportSync** is required to copy videos, environment file and device allure results data to folder allure-results.
+> - **reportSync** is required to copy videos, environment file and device allure results data to folder allure-results. Example: ```gradle reportSync --no-daemon``` (or with gradle wrapper ```gradlew reportSync --no-daemon```)
 ## Properties
 > - **screenRecordType** is needed to choose the current screen record attachment type of marathon. There are two options:
 > *SCREENSHOT* and *VIDEO* (default is *SCREENSHOT*, also for empty screenRecordType property).
