@@ -19,10 +19,19 @@ import java.nio.file.attribute.BasicFileAttributes
 
 val logger = AresLogger(AresPlugin::class.java)
 
+val marathonVideoDir: (String) -> File = {
+    File("${it}video")
+}
+
+val marathonGifDir: (String) -> File = {
+    File("${it}screenshot")
+}
+
 internal fun copyVideos(projectDirectory: String) {
     logger.info("Transferring videos")
-    val marathonVideoDir = File("${Configuration.getReportDirectory(projectDirectory)}video")
-    val marathonGifDir = File("${Configuration.getReportDirectory(projectDirectory)}screenshot")
+    val reportDir = Configuration.getReportDirectory(projectDirectory)
+    val marathonVideoDir = marathonVideoDir(reportDir)
+    val marathonGifDir = marathonGifDir(reportDir)
     val currentMarathonScreenRecordDirectory = "${Configuration.getReportDirectory(projectDirectory)}${ScreenRecordAttachment.directoryName}"
     if(marathonVideoDir.exists() || marathonGifDir.exists()) {
         try {

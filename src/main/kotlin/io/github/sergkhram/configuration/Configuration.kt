@@ -4,8 +4,8 @@ import java.io.File
 
 object Configuration {
     var buildType: String = "debug"
-    var screenRecordType: ScreenRecordType = ScreenRecordType.valueOf("SCREENSHOT")
-    var enrichBy: EnrichVariant = EnrichVariant.valueOf("MARATHON")
+    var screenRecordType: ScreenRecordType = ScreenRecordType.VIDEO
+    var enrichBy: EnrichVariant = EnrichVariant.MARATHON
     var remoteAllureFolder: String = "/sdcard/allure-results"
     var isMarathonCLI: Boolean = false
     val testDirectory: String by lazy {
@@ -23,9 +23,14 @@ object Configuration {
     }
 
     var logFile: File? = null
+    var executionIgnoreFailures: Boolean = false
 }
 
 enum class EnrichVariant {
     MARATHON,
     CLEAN_ALLURE
+}
+
+enum class ExecuteBy {
+    MARATHON
 }
