@@ -9,6 +9,10 @@ dependencies {
     implementation(gradleApi())
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
     implementation("com.malinskiy:adam:0.2.3")
+    implementation("com.malinskiy.marathon:marathon-gradle-plugin:0.6.2")
+    implementation("com.malinskiy.marathon:base:0.6.2")
+    implementation("com.malinskiy.marathon:core:0.6.2")
+    implementation("io.qameta.allure:allure-gradle:2.8.1")
     gradleApi()
 }
 
@@ -31,6 +35,8 @@ gradlePlugin {
 repositories {
     jcenter()
     mavenCentral()
+    google()
+    gradlePluginPortal()
 }
 
 java {
