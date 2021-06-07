@@ -25,7 +25,7 @@ class MarathonEnrichService(
             logger.info("Loading allure json files")
             listOfAllureDeviceJsonFiles = allureDeviceResDirectory.listFiles()!!.filter { isResultJsonFile(it) }
         } catch (e: Exception) {
-            throw CustomException("There is no ${Configuration.getReportDirectory(projectDirectory)}allure-device-results directory. Check your buildType")
+            throw CustomException("There is no ${Configuration.getReportDirectory(projectDirectory)}allure-device-results or ${Configuration.getReportDirectory(projectDirectory)}device-results/allure-results directory. Check your buildType")
         }
         listOfAllureDeviceJsonFiles?.let {
             logger.debug("Count of allure device Json files ${it.size}")

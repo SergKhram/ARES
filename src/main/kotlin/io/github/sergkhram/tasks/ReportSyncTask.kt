@@ -18,7 +18,9 @@ import io.github.sergkhram.logger as customLogger
 
 open class ReportSyncTask: DefaultTask() {
     private val allureDeviceResDirectory: (String) -> File = {
-        File("${Configuration.getReportDirectory(it)}allure-device-results")
+        val marathonZeroSixOnePath = "${Configuration.getReportDirectory(it)}allure-device-results"
+        val marathonZeroSixTwoPath = "${Configuration.getReportDirectory(it)}device-files/allure-results"
+        if(File(marathonZeroSixOnePath).exists()) File(marathonZeroSixOnePath) else File(marathonZeroSixTwoPath)
     }
     private val marathonAllureResDirectory: (String) -> File = {
         File("${Configuration.getReportDirectory(it)}allure-results")

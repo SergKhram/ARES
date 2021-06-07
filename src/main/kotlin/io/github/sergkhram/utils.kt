@@ -21,15 +21,19 @@ val logger = AresLogger(AresPlugin::class.java)
 
 internal fun copyVideos(projectDirectory: String) {
     logger.info("Transferring videos")
-    val marathonScreenRecordDirectory = "${Configuration.getReportDirectory(projectDirectory)}${ScreenRecordAttachment.directoryName}"
-    try {
-        File(
-            marathonScreenRecordDirectory
-        ).listFiles()!!.filter { it.isDirectory }.forEach { vidDir ->
-            vidDir.copyFolder(projectDirectory)
+    val marathonVideoDir = File("${Configuration.getReportDirectory(projectDirectory)}video")
+    val marathonGifDir = File("${Configuration.getReportDirectory(projectDirectory)}screenshot")
+    val currentMarathonScreenRecordDirectory = "${Configuration.getReportDirectory(projectDirectory)}${ScreenRecordAttachment.directoryName}"
+    if(marathonVideoDir.exists() || marathonGifDir.exists()) {
+        try {
+            File(
+                currentMarathonScreenRecordDirectory
+            ).listFiles()!!.filter { it.isDirectory }.forEach { vidDir ->
+                vidDir.copyFolder(projectDirectory)
+            }
+        } catch (e: KotlinNullPointerException) {
+            throw CustomException("There is no $currentMarathonScreenRecordDirectory directory. Check the attachmentType property")
         }
-    } catch (e: KotlinNullPointerException) {
-        throw CustomException("There is no $marathonScreenRecordDirectory directory. Check the attachmentType property")
     }
 }
 
