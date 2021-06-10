@@ -3,6 +3,8 @@ package io.github.sergkhram
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.sergkhram.configuration.Configuration
+import io.github.sergkhram.configuration.ConfigurationExtension
+import io.github.sergkhram.configuration.ExecuteBy
 import io.github.sergkhram.configuration.ScreenRecordAttachment
 import io.github.sergkhram.helpers.AresLogger
 import io.github.sergkhram.helpers.CustomException
@@ -41,7 +43,7 @@ internal fun copyVideos(projectDirectory: String) {
                 vidDir.copyFolder(projectDirectory)
             }
         } catch (e: KotlinNullPointerException) {
-            throw CustomException("There is no $currentMarathonScreenRecordDirectory directory. Check the attachmentType property")
+            throw CustomException("There is no $currentMarathonScreenRecordDirectory directory. Check the screenRecordType property")
         }
     }
 }
@@ -171,5 +173,14 @@ val androidHome: File? = when {
         home?.let {
             File("$it/Android/Sdk").checkDirectoryExisting()
         }
+    }
+}
+
+fun getPropertyExecuteBy(aresExtension: ConfigurationExtension): ExecuteBy? {
+    return try {
+        System.getProperty("executeBy")?.let { ExecuteBy.valueOf(it) }
+            ?: aresExtension.testExecutionBlock?.executeBy?.let { ExecuteBy.valueOf(it) }
+    } catch (e: IllegalArgumentException) {
+        throw CustomException("There is no chosen executeBy variant, only these values are supported : ${ExecuteBy.values().map {it.name}}")
     }
 }
