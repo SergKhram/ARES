@@ -75,11 +75,11 @@ ares {
 }
 ```
 **marathonBlock** properties:
-> - screenRecordType
-> - buildType
-> - isMarathonCLI
-> - reportDirectory
+> - screenRecordType - String (VIDEO || SCREENSHOT)
+> - buildType - String
+> - isMarathonCLI - Boolean
+> - reportDirectory - String
 
 **allureBlock** properties:
-> - remoteAllureFolder
-> - deviceSerials
+> - remoteAllureFolder - String
+> - deviceSerials - String with delimiter ','
