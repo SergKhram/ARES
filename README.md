@@ -74,3 +74,12 @@ ares {
     asyncFilesTransferThreadsCount = 50
 }
 ```
+**marathonBlock** properties:
+> - screenRecordType
+> - buildType
+> - isMarathonCLI
+> - reportDirectory
+
+**allureBlock** properties:
+> - remoteAllureFolder
+> - deviceSerials
