@@ -1,5 +1,6 @@
 package io.github.sergkhram.tasks
 
+import com.malinskiy.marathon.FixedQuotaRetryStrategyConfiguration
 import com.malinskiy.marathon.MarathonRunTask
 import com.malinskiy.marathon.android.configuration.AllureConfiguration
 import com.malinskiy.marathon.device.DeviceFeature
@@ -9,6 +10,7 @@ import io.github.sergkhram.configuration.ConfigurationExtension
 import io.github.sergkhram.configuration.MarathonBlock
 import io.github.sergkhram.configuration.ScreenRecordAttachment
 import io.github.sergkhram.helpers.CustomException
+import io.github.sergkhram.helpers.Defaults.NO_RETRY_STRATEGY_VALUE
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.get
@@ -70,11 +72,17 @@ fun MarathonRunTask.enableAllureForMarathon() {
 }
 
 fun MarathonRunTask.getRetryCountValue(): Int {
-    return this.marathonExtension.get().retryStrategy?.let { retryStrategy ->
-        retryStrategy.fixedQuota?.let { fixedQuota ->
-            fixedQuota.retryPerTestQuota
-        }
-    } ?: 3
+    val retryStrategy = this.marathonExtension.get().retryStrategy
+    return if(retryStrategy?.fixedQuota == null) {
+        NO_RETRY_STRATEGY_VALUE
+    } else {
+        retryStrategy.fixedQuota!!.retryPerTestQuota ?: FixedQuotaRetryStrategyConfiguration().retryPerTestQuota
+    }
+//    return this.marathonExtension.get().retryStrategy?.let { retryStrategy ->
+//        retryStrategy.fixedQuota?.let { fixedQuota ->
+//            fixedQuota.retryPerTestQuota
+//        }
+//    } ?: 3
 }
 
 fun ConfigurationExtension.setScreenRecordTypeFromMarathon(marathonTask: MarathonRunTask) {
