@@ -78,11 +78,6 @@ fun MarathonRunTask.getRetryCountValue(): Int {
     } else {
         retryStrategy.fixedQuota!!.retryPerTestQuota ?: FixedQuotaRetryStrategyConfiguration().retryPerTestQuota
     }
-//    return this.marathonExtension.get().retryStrategy?.let { retryStrategy ->
-//        retryStrategy.fixedQuota?.let { fixedQuota ->
-//            fixedQuota.retryPerTestQuota
-//        }
-//    } ?: 3
 }
 
 fun ConfigurationExtension.setScreenRecordTypeFromMarathon(marathonTask: MarathonRunTask) {
