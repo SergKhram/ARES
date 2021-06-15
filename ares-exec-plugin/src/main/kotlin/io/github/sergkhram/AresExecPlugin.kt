@@ -16,11 +16,11 @@ class AresExecPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         project.plugins.apply(AresPlugin::class)
-        val aresExtension: ConfigurationExtension = project.extensions.get("ares") as ConfigurationExtension
-        val executeBy = getPropertyExecuteBy(aresExtension)
-        executeBy?.let {
         project.plugins.apply(MarathonPlugin::class)
         project.afterEvaluate {
+            val aresExtension: ConfigurationExtension = project.extensions.get("ares") as ConfigurationExtension
+            val executeBy = getPropertyExecuteBy(aresExtension)
+            executeBy?.let {
                 when(it) {
                     ExecuteBy.MARATHON -> {
                         val buildType = System.getProperty("buildType")?.toString() ?: aresExtension.marathonBlock?.buildType ?: "debug"
