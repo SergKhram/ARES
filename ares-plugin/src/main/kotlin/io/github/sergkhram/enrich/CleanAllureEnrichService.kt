@@ -29,10 +29,10 @@ class CleanAllureEnrichService(
     override fun iterableEnrich() {
         logger.info("Getting results from device")
         runBlocking {
-            androidHome?.let {
+            Configuration.androidHome?.let {
                 logger.info("Android SDK directory is '$it'")
             }
-            val adb = AdbManager(androidHome)
+            val adb = AdbManager(Configuration.androidHome)
             if(adb.startAdb()) {
                 logger.debug("Starting adb client factory")
                 adb.initAdbClient()
