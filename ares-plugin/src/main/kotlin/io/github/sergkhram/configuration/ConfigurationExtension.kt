@@ -1,8 +1,10 @@
 package io.github.sergkhram.configuration
 
 import groovy.lang.Closure
+import io.github.sergkhram.androidHomeDir
 import io.github.sergkhram.helpers.CustomException
 import org.gradle.api.Project
+import java.io.File
 
 open class ConfigurationExtension(project: Project) {
     var marathonBlock: MarathonBlock? = null
@@ -12,6 +14,7 @@ open class ConfigurationExtension(project: Project) {
     var startAsyncOtherFilesTransferFrom: Int = 500
     var asyncFilesTransferThreadsCount: Int = 10
     var testExecutionBlock: TestExecutionBlock? = null
+    var androidHome: String? = null
 
     fun marathonBlock(block: MarathonBlock.() -> Unit) {
         marathonBlock = MarathonBlock().also(block)
@@ -67,6 +70,7 @@ fun ConfigurationExtension.provideConfiguration() {
     Configuration.asyncFilesTransferThreadsCount =
         initAsyncFilesTransferring("asyncFilesTransferThreadsCount", this.asyncFilesTransferThreadsCount)
     Configuration.executionIgnoreFailures = System.getProperty("executionIgnoreFailures")?.toBoolean() ?: this.testExecutionBlock?.executionIgnoreFailures ?: false
+    Configuration.androidHome = System.getProperty("androidHome")?.let { File(it) } ?: this.androidHome?.let{ File(it)} ?: androidHomeDir
 }
 
 private fun initAsyncFilesTransferring(propertyName: String, defaultValue: Int): Int {

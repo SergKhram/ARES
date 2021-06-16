@@ -140,10 +140,10 @@ class MarathonEnrichService(
             runBlocking {
                 var adb: AdbManager? = null
                 try {
-                    androidHome?.let {
+                    Configuration.androidHome?.let {
                         logger.info("Android SDK directory is '$it'")
                     }
-                    adb = AdbManager(androidHome)
+                    adb = AdbManager(Configuration.androidHome)
                     if(adb.startAdb()) {
                         logger.debug("Starting adb client factory")
                         adb.initAdbClient()
