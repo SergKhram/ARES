@@ -82,6 +82,7 @@ ares {
 
 **allureBlock** properties:
 > - remoteAllureFolder - String
+> - deviceSerials - String with delimiter ','
 
 License
 -------
@@ -97,5 +98,3 @@ License
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
-> - deviceSerials - String with delimiter ','
