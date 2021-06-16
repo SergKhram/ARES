@@ -24,6 +24,8 @@ object Configuration {
 
     var logFile: File? = null
     var executionIgnoreFailures: Boolean = false
+
+    var androidHome: File? = null
 }
 
 enum class EnrichVariant {

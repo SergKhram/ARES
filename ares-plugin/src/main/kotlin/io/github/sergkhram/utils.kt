@@ -155,7 +155,7 @@ fun File.checkDirectoryExisting(): File? {
     }
 }
 
-val androidHome: File? = when {
+val androidHomeDir: File? = when {
     Os.isFamily(Os.FAMILY_WINDOWS) -> {
         val user = System.getenv("USER") ?: System.getenv("USERNAME") ?: null
         user?.let {
