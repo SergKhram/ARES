@@ -18,12 +18,13 @@ import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import kotlin.math.roundToInt
+import java.util.concurrent.ConcurrentHashMap
 
 class CleanAllureEnrichService(
     private val mapper: ObjectMapper,
     private val projectDirectory: String
 ) : EnrichService {
-    val devicesInfo = mutableMapOf<String, DeviceInfo?>()
+    val devicesInfo = ConcurrentHashMap<String, DeviceInfo?>()
 
     override fun iterableEnrich() {
         logger.info("Getting results from device")
@@ -42,7 +43,7 @@ class CleanAllureEnrichService(
                 filteredDevices.forEach {
                     val model = adb.getModel(it.serial)
                     val osVersion = adb.getOsVersion(it.serial)
-                    devicesInfo.put(it.serial, if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) DeviceInfo(model, osVersion) else null)
+                    devicesInfo[it.serial] = if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) DeviceInfo(model, osVersion) else null
                 }
                 filteredDevices.forEach { device ->
                     transferringFilesByDevice(this, adb, device)
