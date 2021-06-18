@@ -8,6 +8,7 @@ import io.github.sergkhram.configuration.Configuration
 import io.github.sergkhram.helpers.*
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 
 class MarathonEnrichService(
@@ -146,9 +147,11 @@ class MarathonEnrichService(
                     if(adb.startAdb()) {
                         logger.debug("Starting adb client factory")
                         adb.initAdbClient()
-                        val model = adb.getModel(serial)
-                        val osVersion = adb.getOsVersion(serial)
-                        deviceInfo = if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) DeviceInfo(model, osVersion) else null
+                        withTimeoutOrNull(4000L) {
+                            val model = adb.getModel(serial)
+                            val osVersion = adb.getOsVersion(serial)
+                            deviceInfo = if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) DeviceInfo(model, osVersion) else null
+                        }
                     }
                 } catch (e: Exception) {
                     logger.debug(e.message ?: e.localizedMessage)
