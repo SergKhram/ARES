@@ -10,6 +10,7 @@ import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 class MarathonEnrichService(
     private val marathonAllureResDirectory: File,
@@ -17,7 +18,7 @@ class MarathonEnrichService(
     private val projectDirectory: String,
     private val allureDeviceResDirectory: File
 ) : EnrichService {
-    val devicesInfo = mutableMapOf<String, DeviceInfo?>()
+    val devicesInfo = ConcurrentHashMap<String, DeviceInfo?>()
 
     override fun iterableEnrich() {
         logger.info("Getting results from Marathon")
@@ -162,7 +163,7 @@ class MarathonEnrichService(
                     logger.debug(e.message ?: e.localizedMessage)
                 }
             }
-            devicesInfo.put(serial, deviceInfo)
+            devicesInfo[serial] = deviceInfo
         }
     }
 }
