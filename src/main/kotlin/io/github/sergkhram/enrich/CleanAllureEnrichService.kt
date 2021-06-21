@@ -16,6 +16,7 @@ import io.github.sergkhram.helpers.pforEach
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import kotlin.math.roundToInt
 import java.util.concurrent.ConcurrentHashMap
@@ -24,7 +25,7 @@ class CleanAllureEnrichService(
     private val mapper: ObjectMapper,
     private val projectDirectory: String
 ) : EnrichService {
-    val devicesInfo = ConcurrentHashMap<String, DeviceInfo?>()
+    val devicesInfo = ConcurrentHashMap<String, DeviceInfo>()
 
     override fun iterableEnrich() {
         logger.info("Getting results from device")
@@ -41,9 +42,17 @@ class CleanAllureEnrichService(
                 val neededDeviceSerials = Configuration.deviceSerials?.split(",") ?: emptyList<String>()
                 val filteredDevices = if(neededDeviceSerials.isNotEmpty()) devices.filter { neededDeviceSerials.contains(it.serial) } else devices
                 filteredDevices.forEach {
-                    val model = adb.getModel(it.serial)
-                    val osVersion = adb.getOsVersion(it.serial)
-                    devicesInfo[it.serial] = if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) DeviceInfo(model, osVersion) else null
+                    var deviceInfo = DeviceInfo()
+                    try {
+                        withTimeoutOrNull(5000L) {
+                            val model = adb.getModel(it.serial)
+                            val osVersion = adb.getOsVersion(it.serial)
+                            if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) deviceInfo = DeviceInfo(model, osVersion)
+                        }
+                    } catch (e: Exception) {
+                        logger.debug(e.message ?: e.localizedMessage)
+                    }
+                    devicesInfo[it.serial] = deviceInfo
                 }
                 filteredDevices.forEach { device ->
                     transferringFilesByDevice(this, adb, device)
