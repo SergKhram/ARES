@@ -26,4 +26,10 @@ class AresLogger<T>(clazz: Class<T>) {
         logger.debug(output)
         Configuration.logFile?.appendText("$output\n")
     }
+
+    fun warn(string: String) {
+        val output = pattern(string)
+        logger.warn(output)
+        Configuration.logFile?.appendText("$output\n")
+    }
 }
