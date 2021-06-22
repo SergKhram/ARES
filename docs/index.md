@@ -1,3 +1,6 @@
+---
+id: home
+---
 
 ## Welcome to GitHub Pages
 
