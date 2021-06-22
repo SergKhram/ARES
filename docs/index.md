@@ -1,42 +1,32 @@
 ---
+layout: default
 id: home
 ---
+![ARES](https://github.com/SergKhram/ARES/blob/develop/ares_blank.png?raw=true)
+# Introduction
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.sergkhram/ares-plugin.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.sergkhram%22%20AND%20a:%22ares-plugin%22)
+[![Build Status](https://github.com/SergKhram/ARES/workflows/build/badge.svg)](https://github.com/SergKhram/ARES/actions)
+[![License](https://img.shields.io/badge/License-Apache%202.0-purple.svg)](https://opensource.org/licenses/Apache-2.0)
 
-## Welcome to GitHub Pages
+**ARES(Android Report Synchro) Plugin**
 
-You can use the [editor on GitHub](https://github.com/SergKhram/ARES/edit/develop/docs/index.md) to maintain and preview the content for your website in Markdown files.
+Based on files from execution of allure-kotlin and marathon.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+allure-kotlin: https://github.com/allure-framework/allure-kotlin
+marathon: https://github.com/Malinskiy/marathon
 
-### Markdown
+License
+-------
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-```markdown
-Syntax highlighted code block
+       http://www.apache.org/licenses/LICENSE-2.0
 
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/SergKhram/ARES/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 
