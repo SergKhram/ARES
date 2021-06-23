@@ -18,4 +18,7 @@ from which is needed to use parallel transferring (the default is 200)</p>
 files count(not the *-result.json, like attachments) from which is needed to use parallel transferring (the default is 500)</p>
  <p><strong>asyncFilesTransferThreadsCount</strong> is the value of threads count, that will be used for parallel
 transferring in case of <strong>startAsyncResultFilesTransferFrom</strong> or <strong>startAsyncOtherFilesTransferFrom</strong> (the default is 10)</p>
+ <p><strong>androidHome</strong> is the value of android home directory(the default is checking android home default location or ANDROID_HOME system property)</p>
+ <p><strong>executeBy</strong> is needed only for ARES execution plugin - execution variant(does not matter by default - if you not set it here or in extension - runTests tasks will not be created). There is only one option now: <em>MARATHON</em></p>
+<p><strong>executionIgnoreFailures</strong> is needed only for ARES execution plugin - if you want an always successful build</p>
   </blockquote>
