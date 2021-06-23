@@ -15,11 +15,17 @@ jobs:
         with:
           java-version: 8
 
-      - name: Prepare to publish
+      - name: Prepare to publish exec
         run: |
           echo '${{secrets.GPG_KEY_CONTENTS}}' | base64 -d > publish_key.gpg
           gpg --quiet --batch --yes --decrypt --passphrase="${{secrets.SECRET_PASSPHRASE}}" \
-          --output secret.gpg publish_key.gpg
+          --output ares-exec-plugin/secret.gpg publish_key.gpg
+
+      - name: Prepare to publish basic
+        run: |
+          echo '${{secrets.GPG_KEY_CONTENTS}}' | base64 -d > publish_key.gpg
+          gpg --quiet --batch --yes --decrypt --passphrase="${{secrets.SECRET_PASSPHRASE}}" \
+          --output ares-plugin/secret.gpg publish_key.gpg
 
       - name: Publish with Gradle
         uses: eskatos/gradle-command-action@v1

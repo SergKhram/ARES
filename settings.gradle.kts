@@ -1,1 +1,3 @@
-rootProject.name = "ares-plugin"
+include("ares-plugin")
+include("ares-exec-plugin")
+rootProject.name = "ares"
