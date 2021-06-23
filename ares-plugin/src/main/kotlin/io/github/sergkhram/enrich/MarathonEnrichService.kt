@@ -18,7 +18,7 @@ class MarathonEnrichService(
     private val projectDirectory: String,
     private val allureDeviceResDirectory: File
 ) : EnrichService {
-    val devicesInfo = ConcurrentHashMap<String, DeviceInfo?>()
+    val devicesInfo = ConcurrentHashMap<String, DeviceInfo>()
 
     override fun iterableEnrich() {
         logger.info("Getting results from Marathon")
@@ -136,7 +136,7 @@ class MarathonEnrichService(
 
     fun prepareDeviceInfoBySerial(serial: String) {
         if(!devicesInfo.containsKey(serial)) {
-            var deviceInfo: DeviceInfo? = null
+            var deviceInfo = DeviceInfo()
 
             runBlocking {
                 var adb: AdbManager? = null
@@ -148,10 +148,10 @@ class MarathonEnrichService(
                     if(adb.startAdb()) {
                         logger.debug("Starting adb client factory")
                         adb.initAdbClient()
-                        withTimeoutOrNull(4000L) {
+                        withTimeoutOrNull(5000L) {
                             val model = adb.getModel(serial)
                             val osVersion = adb.getOsVersion(serial)
-                            deviceInfo = if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) DeviceInfo(model, osVersion) else null
+                            if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) deviceInfo = DeviceInfo(model, osVersion)
                         }
                     }
                 } catch (e: Exception) {

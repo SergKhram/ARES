@@ -1,3 +1,5 @@
+import java.net.URI
+
 group = "io.github.sergkhram"
 version = "1.2.0-RELEASE"
 
