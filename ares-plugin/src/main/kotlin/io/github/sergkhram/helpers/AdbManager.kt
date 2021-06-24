@@ -32,7 +32,7 @@ class AdbManager(val androidHome: File?) {
     }
 
     suspend fun startAdb(): Boolean {
-        val adbBinary =  File(androidHome, "platform-tools" + File.separator + if(Os.isFamily(Os.FAMILY_WINDOWS)) "adb.exe" else "adb")
+        val adbBinary =  File(androidHome, "platform-tools" + Configuration.separator + if(Os.isFamily(Os.FAMILY_WINDOWS)) "adb.exe" else "adb")
         return StartAdbInteractor().execute(adbBinary = adbBinary)
     }
 
