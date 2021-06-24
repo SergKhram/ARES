@@ -9,8 +9,10 @@ id: home
 [![License](https://img.shields.io/badge/License-Apache%202.0-purple.svg)](https://opensource.org/licenses/Apache-2.0)
 
 **ARES(Android Report Synchro) Plugin**
+- Receiving allure result files to the allure-results folder with enrichment of different information (on which device the test is running, device model, device OS version)
 
-Receiving allure result files to the allure-results folder with enrichment of different information (on which device the test is running, device model, device OS version)
+**ARES Execution Plugin**
+- ARES(Android Report Synchro) Plugin + test execution tasks
 
 Based on files from execution of allure-kotlin and marathon.
 
