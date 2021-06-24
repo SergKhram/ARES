@@ -7,6 +7,8 @@
 
 **ARES(Android Report Synchro) Plugin**
 
+Receiving allure result files to the allure-results folder with enrichment of different information (on which device the test is running, device model, device OS version)
+
 Based on files from execution of allure-kotlin and marathon.
 
 allure-kotlin: https://github.com/allure-framework/allure-kotlin
