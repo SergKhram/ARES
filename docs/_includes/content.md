@@ -5,8 +5,10 @@
 <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-purple.svg" alt="License" /></a></p>
 
 <p><strong>ARES(Android Report Synchro) Plugin</strong></p>
+<blockquote><p>Receiving allure result files to the allure-results folder with enrichment of different information (on which device the test is running, device model, device OS version)</p></blockquote>
 
-<p>Receiving allure result files to the allure-results folder with enrichment of different information (on which device the test is running, device model, device OS version)</p>
+<p><strong>ARES Execution Plugin</strong></p>
+<blockquote><p>ARES(Android Report Synchro) Plugin + test execution tasks</p></blockquote>
 <p>Based on files from execution of allure-kotlin and marathon</p>
 
 <p>allure-kotlin: https://github.com/allure-framework/allure-kotlin
