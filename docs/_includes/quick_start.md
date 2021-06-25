@@ -21,6 +21,8 @@
 }
 </code></pre></div></div>
 
+<h4 style="color:#444;"><p>Required gradle version >= 6.8</p></h4>
+
 <p>If you have this problem after implementing ARES execution plugin:<p>
 <p><div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FAILURE: Build failed with an exception.
 
