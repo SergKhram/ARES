@@ -92,7 +92,7 @@ class CleanAllureEnrichService(
         logger.info("Pulling allure file: ${file.name}")
         val pullDevicesRequest = PullFileRequest(
             "${Configuration.remoteAllureFolder}/${file.name}",
-            File("${projectDirectory}/build/allure-results/${prefix}${file.name}"),
+            File("${projectDirectory}${Configuration.separator}build${Configuration.separator}allure-results${Configuration.separator}${prefix}${file.name}"),
             coroutineContext = scope.coroutineContext)
         val channel = adb.pullFiles(pullDevicesRequest, scope, device.serial)!!
 
@@ -106,7 +106,7 @@ class CleanAllureEnrichService(
     private suspend fun pullResultFilesWithEnrich(scope: CoroutineScope, adb: AdbManager, device: Device, file: FileEntryV1) {
         pullFile(scope, adb, device, file, "temp-")
 
-        var tempAllureResultFile = File("${projectDirectory}/build/allure-results/temp-${file.name}").asJson(mapper)
+        var tempAllureResultFile = File("${projectDirectory}${Configuration.separator}build${Configuration.separator}allure-results${Configuration.separator}temp-${file.name}").asJson(mapper)
         val realHost = mapper.createObjectNode()
             .put("name", "host")
             .put("value", device.serial)
@@ -131,7 +131,7 @@ class CleanAllureEnrichService(
             }
         }
 
-        File("$projectDirectory/build/allure-results/${file.name}").apply {
+        File("$projectDirectory${Configuration.separator}build${Configuration.separator}allure-results${Configuration.separator}${file.name}").apply {
             this.setWritable(true)
             this.writeText(
                 mapper
@@ -139,7 +139,7 @@ class CleanAllureEnrichService(
                     .writeValueAsString(tempAllureResultFile)
             )
         }
-        File("${projectDirectory}/build/allure-results/temp-${file.name}").delete()
+        File("${projectDirectory}${Configuration.separator}build${Configuration.separator}allure-results${Configuration.separator}temp-${file.name}").delete()
     }
 
     private suspend fun transferringFilesByDevice(scope: CoroutineScope,

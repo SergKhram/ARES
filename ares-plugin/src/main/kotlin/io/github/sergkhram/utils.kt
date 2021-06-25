@@ -51,7 +51,7 @@ internal fun copyVideos(projectDirectory: String) {
 @Throws(IOException::class)
 fun File.copyFolder(projectDirectory: String) {
     val source = this
-    val target = Paths.get("$projectDirectory/build/allure-results/${this.name}")
+    val target = Paths.get("$projectDirectory${Configuration.separator}build${Configuration.separator}allure-results${Configuration.separator}${this.name}")
     Files.walkFileTree(source.toPath(), object : SimpleFileVisitor<Path>() {
         @Throws(IOException::class)
         override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
@@ -93,12 +93,12 @@ internal fun copyFiles(dir: File, projectDirectory: String, condition: (File) ->
 internal fun File.copyFile(projectDirectory: String) {
     copy(
         Paths.get(this.path),
-        Paths.get("$projectDirectory/build/allure-results/${this.name}")
+        Paths.get("$projectDirectory${Configuration.separator}build${Configuration.separator}allure-results${Configuration.separator}${this.name}")
     )
 }
 
 internal fun createAllureResultsDirectory(projectDirectory: String) {
-    val directory = File("$projectDirectory/build/allure-results")
+    val directory = File("$projectDirectory${Configuration.separator}build${Configuration.separator}allure-results")
     recursivelyDelete(directory)
 }
 
