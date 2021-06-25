@@ -20,3 +20,19 @@
   id 'io.github.sergkhram.aresExecPlugin'
 }
 </code></pre></div></div>
+
+<p>If you have this problem after implementing ARES execution plugin:<p>
+<p><div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FAILURE: Build failed with an exception.
+
+What went wrong:
+A problem occurred configuring project ':app'.
+ Failed to notify project evaluation listener.
+    com.google.common.collect.ImmutableList.toImmutableList()Ljava/util/stream/Collector;
+</code></pre></div></div></p>
+<p>You need to add guava implementation:</p>
+<p><div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>classpath('com.google.guava:guava'){
+    version {
+        strictly '30.1.1-jre'
+    }
+}
+</code></pre></div></div></p>
