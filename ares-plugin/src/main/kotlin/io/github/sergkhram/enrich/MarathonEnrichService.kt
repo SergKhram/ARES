@@ -27,7 +27,7 @@ class MarathonEnrichService(
             logger.info("Loading allure json files")
             listOfAllureDeviceJsonFiles = allureDeviceResDirectory.listFiles()!!.filter { isResultJsonFile(it) }
         } catch (e: Exception) {
-            throw CustomException("There is no ${Configuration.getReportDirectory(projectDirectory)}allure-device-results or ${Configuration.getReportDirectory(projectDirectory)}device-results/allure-results directory. Check your buildType")
+            throw CustomException("There is no ${Configuration.getReportDirectory(projectDirectory)}allure-device-results or ${Configuration.getReportDirectory(projectDirectory)}device-results${Configuration.separator}allure-results directory. Check your buildType")
         }
         listOfAllureDeviceJsonFiles?.let {
             logger.debug("Count of allure device Json files ${it.size}")
@@ -113,7 +113,7 @@ class MarathonEnrichService(
                     (currentDeviceFile["labels"] as ArrayNode).add(mapper.createOsVersionTag(it))
                 }
             }
-            File("$projectDirectory/build/allure-results/${deviceAllureFile.name}").apply {
+            File("$projectDirectory${Configuration.separator}build${Configuration.separator}allure-results${Configuration.separator}${deviceAllureFile.name}").apply {
                 this.setWritable(true)
                 this.writeText(
                     mapper
@@ -123,7 +123,7 @@ class MarathonEnrichService(
             }
         } else {
             logger.info("Didn't find marathon file is appropriate to current allure-device-file ${deviceAllureFile.name}")
-            File("$projectDirectory/build/allure-results/${deviceAllureFile.name}").apply {
+            File("$projectDirectory${Configuration.separator}build${Configuration.separator}allure-results${Configuration.separator}${deviceAllureFile.name}").apply {
                 this.setWritable(true)
                 this.writeText(
                     mapper
