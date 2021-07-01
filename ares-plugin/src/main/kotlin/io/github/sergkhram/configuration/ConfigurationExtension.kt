@@ -71,6 +71,7 @@ fun ConfigurationExtension.provideConfiguration() {
         initAsyncFilesTransferring("asyncFilesTransferThreadsCount", this.asyncFilesTransferThreadsCount)
     Configuration.executionIgnoreFailures = System.getProperty("executionIgnoreFailures")?.toBoolean() ?: this.testExecutionBlock?.executionIgnoreFailures ?: false
     Configuration.androidHome = System.getProperty("androidHome")?.let { File(it) } ?: this.androidHome?.let{ File(it)} ?: androidHomeDir
+    Configuration.copyCrashedTests = System.getProperty("copyCrashedTests")?.toBoolean() ?: this.marathonBlock?.copyCrashedTests ?: false
 }
 
 private fun initAsyncFilesTransferring(propertyName: String, defaultValue: Int): Int {

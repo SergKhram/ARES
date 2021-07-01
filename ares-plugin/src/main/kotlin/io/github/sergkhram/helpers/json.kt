@@ -39,3 +39,9 @@ fun ObjectMapper.createModelTag(modelName: String) = this.createObjectNode()
 fun ObjectMapper.createOsVersionTag(osVersion: String) = this.createObjectNode()
         .put("name", "tag")
         .put("value", "OS_VERSION_${osVersion.trim()}")
+
+fun JsonNode.getLogAttachments() = (
+        this["attachments"] as ArrayNode
+    ).filter {
+        elem -> elem["type"].asText() == "text/txt" && elem["name"].asText() == "Log"
+}

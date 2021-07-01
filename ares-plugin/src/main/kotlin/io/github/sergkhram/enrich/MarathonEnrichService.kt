@@ -44,11 +44,15 @@ class MarathonEnrichService(
                 }
             }
         }
+        if(Configuration.copyCrashedTests) {
+            copyCrashedTests(listOfAllureDeviceJsonFiles)
+        }
         copyOtherFiles()
     }
 
     private fun copyOtherFiles() {
         copyVideos(projectDirectory)
+        copyMarathonLogs(projectDirectory)
         logger.info("Transferring other files")
         copyFiles(
             allureDeviceResDirectory,
@@ -83,14 +87,22 @@ class MarathonEnrichService(
             val currentMarathonFile = marathonAllureFile.asJson(mapper)
 
             val videoAttachments = currentMarathonFile.getVideoAttachments()
+            val logAttachments = currentMarathonFile.getLogAttachments()
 
-            if (videoAttachments.isNotEmpty()) {
+            if (videoAttachments.isNotEmpty() || logAttachments.isNotEmpty()) {
                 if(currentDeviceFile["attachments"] == null) {
                     (currentDeviceFile as ObjectNode).put("attachments", mapper.createArrayNode())
                 }
-                (currentDeviceFile["attachments"] as ArrayNode).add(
-                    prepareVideoAttachments(mapper, videoAttachments)
-                )
+                if(videoAttachments.isNotEmpty()) {
+                    (currentDeviceFile["attachments"] as ArrayNode).add(
+                        prepareVideoAttachments(mapper, videoAttachments)
+                    )
+                }
+                if(logAttachments.isNotEmpty()) {
+                    (currentDeviceFile["attachments"] as ArrayNode).add(
+                        prepareMarathonLogAttachments(mapper, logAttachments)
+                    )
+                }
             }
 
             val realHost = currentMarathonFile.getHostLabel()
@@ -164,6 +176,27 @@ class MarathonEnrichService(
                 }
             }
             devicesInfo[serial] = deviceInfo
+        }
+    }
+
+    private fun copyCrashedTests(deviceAllureFiles: List<File>) {
+        val marathonAllureFiles = marathonAllureResDirectory.listFiles()?.filter { marathonAllureFile ->
+            isResultJsonFile(marathonAllureFile) &&
+            deviceAllureFiles.map {
+                deviceAllureFile -> deviceAllureFile.asJson(mapper).getFullName()
+            }.filter {
+                it.contains(marathonAllureFile.asJson(mapper).getPackageLabel() + "." + marathonAllureFile.asJson(mapper).getFullName())
+            }.isNullOrEmpty()
+        }
+        marathonAllureFiles?.forEach { marathonAllureFile ->
+            File("$projectDirectory${Configuration.separator}build${Configuration.separator}allure-results${Configuration.separator}${marathonAllureFile.name}").apply {
+                this.setWritable(true)
+                this.writeText(
+                    mapper
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(marathonAllureFile.asJson(mapper))
+                )
+            }
         }
     }
 }

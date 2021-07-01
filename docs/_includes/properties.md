@@ -21,4 +21,5 @@ transferring in case of <strong>startAsyncResultFilesTransferFrom</strong> or <s
  <p><strong>androidHome</strong> is the value of android home directory path(default is checking android home default location or ANDROID_HOME system property)</p>
  <p><strong>executeBy</strong> is required only for ARES execution plugin - execution variant(does not matter by default - if you are not set it here or in extension - runTests tasks will not be created). There is only one option: <em>MARATHON</em></p>
 <p><strong>executionIgnoreFailures</strong> is required only for ARES execution plugin - if you want an always successful build</p>
+<p><strong>copyCrashedTests</strong> is required to copy marathon allure result file of crashed test(without device allure result file, default is <em>false</em>) - only for enrichBy = <em>MARATHON</em></p>
   </blockquote>
