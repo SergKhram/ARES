@@ -18,6 +18,8 @@ marathon: https://github.com/Malinskiy/marathon
 
 More information about plugin: [Wiki](https://sergkhram.github.io/ARES/)
 
+Q&A - [Telegram channel](https://t.me/ares_plugin)
+
 License
 -------
 
