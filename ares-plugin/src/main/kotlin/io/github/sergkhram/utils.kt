@@ -29,6 +29,10 @@ val marathonGifDir: (String) -> File = {
     File("${it}screenshot")
 }
 
+val marathonLogsDir: (String) -> File = {
+    File("${it}logs")
+}
+
 internal fun copyVideos(projectDirectory: String) {
     logger.info("Transferring videos")
     val reportDir = Configuration.getReportDirectory(projectDirectory)
@@ -182,5 +186,33 @@ fun getPropertyExecuteBy(aresExtension: ConfigurationExtension): ExecuteBy? {
             ?: aresExtension.testExecutionBlock?.executeBy?.let { ExecuteBy.valueOf(it) }
     } catch (e: IllegalArgumentException) {
         throw CustomException("There is no chosen executeBy variant, only these values are supported : ${ExecuteBy.values().map {it.name}}")
+    }
+}
+
+internal fun prepareMarathonLogAttachments(mapper: ObjectMapper, videoAtt: List<JsonNode>): JsonNode {
+    val path = videoAtt.first()["source"].asText()
+    val separator = Paths.get(path).fileSystem.separator
+    return mapper.createObjectNode().apply {
+        this.put("name", "MarathonLog")
+        this.put(
+                "source",
+                path.split("logs$separator").last()
+        )
+        this.put("type", "text/plain")
+    }!!
+}
+
+internal fun copyMarathonLogs(projectDirectory: String) {
+    logger.info("Transferring marathon logs")
+    val reportDir = Configuration.getReportDirectory(projectDirectory)
+    val marathonLogsDir = marathonLogsDir(reportDir)
+    if(marathonLogsDir.exists()) {
+        try {
+            marathonLogsDir.listFiles()!!.filter { it.isDirectory }.forEach { logDir ->
+                logDir.copyFolder(projectDirectory)
+            }
+        } catch (e: KotlinNullPointerException) {
+            throw CustomException("There is no ${marathonLogsDir.absolutePath} directory. Check the screenRecordType property")
+        }
     }
 }
