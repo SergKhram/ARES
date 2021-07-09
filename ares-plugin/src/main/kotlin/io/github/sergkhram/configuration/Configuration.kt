@@ -27,6 +27,7 @@ object Configuration {
     var executionIgnoreFailures: Boolean = false
 
     var androidHome: File? = null
+    var copyCrashedTests: Boolean = false
 }
 
 enum class EnrichVariant {

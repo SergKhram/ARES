@@ -1,7 +1,7 @@
 import java.net.URI
 
 group = "io.github.sergkhram"
-version = "1.2.1-RELEASE"
+version = "1.2.2-RELEASE"
 
 plugins {
     kotlin("jvm")

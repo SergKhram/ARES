@@ -35,6 +35,7 @@
 <p>buildType - String</p>
 <p>isMarathonCLI - Boolean</p>
 <p>reportDirectory - String</p>
+<p>copyCrashedTests - Boolean</p>
 </blockquote>
 
 <p><strong>allureBlock</strong> properties:</p>
