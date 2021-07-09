@@ -11,6 +11,7 @@ import com.malinskiy.adam.request.sync.model.FileEntryV1
 import com.malinskiy.adam.request.sync.v1.ListFileRequest
 import com.malinskiy.adam.request.sync.v1.PullFileRequest
 import io.github.sergkhram.configuration.Configuration
+import io.github.sergkhram.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -32,7 +33,10 @@ class AdbManager(val androidHome: File?) {
     }
 
     suspend fun startAdb(): Boolean {
-        val adbBinary =  File(androidHome, "platform-tools" + Configuration.separator + if(Os.isFamily(Os.FAMILY_WINDOWS)) "adb.exe" else "adb")
+        val additionalPath = "platform-tools" + Configuration.separator + if(Os.isFamily(Os.FAMILY_WINDOWS)) "adb.exe" else "adb"
+        logger.info("ADB directory is $androidHome${Configuration.separator}$additionalPath")
+        val adbBinary =  File(androidHome, additionalPath)
+        logger.info("${adbBinary.canonicalPath} exists - ${adbBinary.exists()}")
         return StartAdbInteractor().execute(adbBinary = adbBinary)
     }
 
