@@ -40,22 +40,30 @@ class CleanAllureEnrichService(
                 val devices: List<Device> = adb.getDeviceList() ?: listOf<Device>()
                 logger.info("Found devices: ${devices.map {it.serial}}")
                 val neededDeviceSerials = Configuration.deviceSerials?.split(",") ?: emptyList<String>()
+                logger.debug("Devices from filter: $neededDeviceSerials")
                 val filteredDevices = if(neededDeviceSerials.isNotEmpty()) devices.filter { neededDeviceSerials.contains(it.serial) } else devices
-                filteredDevices.forEach {
-                    var deviceInfo = DeviceInfo()
-                    try {
-                        withTimeoutOrNull(5000L) {
-                            val model = adb.getModel(it.serial)
-                            val osVersion = adb.getOsVersion(it.serial)
-                            if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) deviceInfo = DeviceInfo(model, osVersion)
+                logger.info("Filtered devices: ${filteredDevices.map { it.serial }}")
+                if(filteredDevices.isNotEmpty()) {
+                    logger.debug("Started getting info about devices")
+                    filteredDevices.forEach {
+                        var deviceInfo = DeviceInfo()
+                        try {
+                            withTimeoutOrNull(5000L) {
+                                val model = adb.getModel(it.serial)
+                                val osVersion = adb.getOsVersion(it.serial)
+                                if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) deviceInfo = DeviceInfo(model, osVersion)
+                            }
+                        } catch (e: Exception) {
+                            logger.debug(e.message ?: e.localizedMessage)
                         }
-                    } catch (e: Exception) {
-                        logger.debug(e.message ?: e.localizedMessage)
+                        devicesInfo[it.serial] = deviceInfo
                     }
-                    devicesInfo[it.serial] = deviceInfo
-                }
-                filteredDevices.forEach { device ->
-                    transferringFilesByDevice(this, adb, device)
+                    logger.debug("Started transferring files from devices")
+                    filteredDevices.forEach { device ->
+                        transferringFilesByDevice(this, adb, device)
+                    }
+                } else {
+                    logger.info("Nothing to do because the filtered list of devices is empty")
                 }
                 logger.debug("Stopping adb")
                 adb.stopAdb()
