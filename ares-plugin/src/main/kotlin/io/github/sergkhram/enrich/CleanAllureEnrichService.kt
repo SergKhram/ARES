@@ -68,7 +68,7 @@ class CleanAllureEnrichService(
                 logger.debug("Stopping adb")
                 adb.stopAdb()
             } else {
-                throw CustomException("Check your ANDROID_HOME env")
+                throw CustomException("Check your ANDROID_HOME")
             }
         }
     }
