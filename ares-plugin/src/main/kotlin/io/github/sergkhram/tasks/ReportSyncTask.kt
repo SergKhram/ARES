@@ -43,7 +43,7 @@ open class ReportSyncTask: DefaultTask() {
             ?: ConfigurationExtension(project)
         conf.provideConfiguration()
         val projectDirectory = project.projectDir.path
-        customLogger.info("Creating directory for allure-results if not exists")
+        customLogger.info("Creating directory for allure-results if doesn't exist")
         createAllureResultsDirectory(projectDirectory) // create directory for allure-results if not exists
 
         val mapper = ObjectMapper()

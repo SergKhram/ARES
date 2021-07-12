@@ -159,26 +159,29 @@ fun File.checkDirectoryExisting(): File? {
     }
 }
 
-val androidHomeDir: File? = when {
-    Os.isFamily(Os.FAMILY_WINDOWS) -> {
-        val user = System.getenv("USER") ?: System.getenv("USERNAME") ?: null
-        user?.let {
-            File("C:\\Users\\$it\\AppData\\Local\\Android\\Sdk").checkDirectoryExisting()
+val androidHomeDir: File? =
+    System.getenv("ANDROID_HOME")?.let { File(it) } ?:
+    System.getenv("ANDROID_SDK_ROOT")?.let{ File(it) } ?:
+    when {
+        Os.isFamily(Os.FAMILY_WINDOWS) -> {
+            val user = System.getenv("USER") ?: System.getenv("USERNAME") ?: null
+            user?.let {
+                File("C:\\Users\\$it\\AppData\\Local\\Android\\Sdk").checkDirectoryExisting()
+            }
+        }
+        Os.isFamily(Os.FAMILY_MAC) -> {
+            val user = System.getenv("USER") ?: null
+            user?.let {
+                File("/Users/$user/Library/Android/sdk").checkDirectoryExisting()
+            }
+        }
+        else -> {
+            val home = System.getenv("HOME") ?: null
+            home?.let {
+                File("$it/Android/Sdk").checkDirectoryExisting()
+            }
         }
     }
-    Os.isFamily(Os.FAMILY_MAC) -> {
-        val user = System.getenv("USER") ?: null
-        user?.let {
-            File("/Users/$user/Library/Android/sdk").checkDirectoryExisting()
-        }
-    }
-    else -> {
-        val home = System.getenv("HOME") ?: null
-        home?.let {
-            File("$it/Android/Sdk").checkDirectoryExisting()
-        }
-    }
-}
 
 fun getPropertyExecuteBy(aresExtension: ConfigurationExtension): ExecuteBy? {
     return try {
