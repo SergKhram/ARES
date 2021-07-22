@@ -79,12 +79,44 @@ class MarathonEnrichService(
     ) {
         logger.info("Enriching allure file: ${deviceAllureFile.name}")
         var currentDeviceFile = deviceAllureFile.asJson(mapper)
-        val marathonAllureFile = marathonAllureResDirectory.listFiles()?.firstOrNull {
+
+        var marathonAllureFile: File?
+        val repeatedDeviceAllureFiles = allureDeviceResDirectory.listFiles()!!.filter {
             isResultJsonFile(it) &&
-            isAppropriateMarathonResultFile(it, mapper, currentDeviceFile)
+            it.asJson(mapper).getFullName() == currentDeviceFile.getFullName()
         }
+        marathonAllureFile = if(repeatedDeviceAllureFiles.size == 1) {
+            marathonAllureResDirectory.listFiles()?.firstOrNull {
+                isResultJsonFile(it) &&
+                simpleAppropriateMarathonResultFile(it, mapper, currentDeviceFile)
+            }
+        } else {
+            val sortedDeviceAllureFiles = repeatedDeviceAllureFiles.sortedBy { it.asJson(mapper).getStartTime() }.map { it.name }
+            val indexOfRepeatedTestResult = sortedDeviceAllureFiles.indexOf(deviceAllureFile.name)
+            marathonAllureResDirectory.listFiles()?.filter {
+                isResultJsonFile(it) &&
+                simpleAppropriateMarathonResultFile(it, mapper, currentDeviceFile)
+            }?.sortedBy { it.asJson(mapper).getStartTime() }?.getOrNull(indexOfRepeatedTestResult)
+        }
+
+//        var marathonAllureFile = marathonAllureResDirectory.listFiles()?.firstOrNull {
+//            isResultJsonFile(it) &&
+//            isAppropriateMarathonResultFile(it, mapper, currentDeviceFile)
+//        }
+//        if(marathonAllureFile == null) {
+//            val simpleMarathonFileFilterResults = marathonAllureResDirectory.listFiles()?.filter {
+//                isResultJsonFile(it) &&
+//                simpleAppropriateMarathonResultFile(it, mapper, currentDeviceFile)
+//            }
+//            simpleMarathonFileFilterResults?.let {
+//                if(it.size == 1) {
+//                    marathonAllureFile = simpleMarathonFileFilterResults.first()
+//                }
+//            }
+//        }
+
         if(marathonAllureFile != null) {
-            val currentMarathonFile = marathonAllureFile.asJson(mapper)
+            val currentMarathonFile = marathonAllureFile!!.asJson(mapper)
 
             val videoAttachments = currentMarathonFile.getVideoAttachments()
             val logAttachments = currentMarathonFile.getLogAttachments()

@@ -9,10 +9,8 @@ internal val isEnvironmentFile: (File) -> Boolean = { it.name.contains("environm
 internal val isResultJsonFile: (File) -> Boolean = { it.isFile && it.extension == "json" && it.nameWithoutExtension.contains("-result") }
 internal val isAppropriateMarathonResultFile: (File, ObjectMapper, JsonNode) -> Boolean = { marathonAllureFile, mapper, currentDeviceFile ->
     val currentMarathonFile = marathonAllureFile.asJson(mapper)
-    val packageLabel = currentMarathonFile.getPackageLabel()
     (
-        currentDeviceFile.getFullName() == (packageLabel + "." + currentMarathonFile.getFullName()) ||
-        currentDeviceFile.getFullName().split("[").first() == (packageLabel + "." + currentMarathonFile.getFullName())
+        simpleAppropriateMarathonResultFile(marathonAllureFile, mapper, currentDeviceFile)
     ) &&
     (
         currentMarathonFile.getStartTime() in currentDeviceFile.getStartTime()..currentDeviceFile.getStopTime() ||
@@ -25,3 +23,12 @@ internal val isResultJson: (String) -> Boolean = { it.contains("-result.json") }
 internal val isNotJson: (String) -> Boolean = { !it.contains(".json") }
 internal val isJsonNoTheResult: (String) -> Boolean = { !it.contains("-result") && it.contains("json") }
 internal val isJsonNotTheResultFile: (File) -> Boolean = { it.isFile && it.extension == "json" && !(it.nameWithoutExtension.contains("-result")) }
+
+internal val simpleAppropriateMarathonResultFile: (File, ObjectMapper, JsonNode) -> Boolean = { marathonAllureFile, mapper, currentDeviceFile ->
+    val currentMarathonFile = marathonAllureFile.asJson(mapper)
+    val packageLabel = currentMarathonFile.getPackageLabel()
+    (
+        currentDeviceFile.getFullName() == (packageLabel + "." + currentMarathonFile.getFullName()) ||
+        currentDeviceFile.getFullName().split("[").first() == (packageLabel + "." + currentMarathonFile.getFullName())
+    )
+}
