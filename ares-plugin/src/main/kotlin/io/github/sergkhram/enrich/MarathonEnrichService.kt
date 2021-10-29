@@ -221,12 +221,28 @@ class MarathonEnrichService(
             }.isNullOrEmpty()
         }
         marathonAllureFiles?.forEach { marathonAllureFile ->
+            val currentMarathonFile = marathonAllureFile!!.asJson(mapper)
+            val videoAttachments = currentMarathonFile.getVideoAttachments()
+            val logAttachments = currentMarathonFile.getLogAttachments()
+
+            if (videoAttachments.isNotEmpty() || logAttachments.isNotEmpty()) {
+                if(videoAttachments.isNotEmpty()) {
+                    (currentMarathonFile["attachments"] as ArrayNode).add(
+                        prepareVideoAttachments(mapper, videoAttachments)
+                    )
+                }
+                if(logAttachments.isNotEmpty()) {
+                    (currentMarathonFile["attachments"] as ArrayNode).add(
+                        prepareMarathonLogAttachments(mapper, logAttachments)
+                    )
+                }
+            }
             File("$projectDirectory${Configuration.separator}build${Configuration.separator}allure-results${Configuration.separator}${marathonAllureFile.name}").apply {
                 this.setWritable(true)
                 this.writeText(
                     mapper
                         .writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(marathonAllureFile.asJson(mapper))
+                        .writeValueAsString(currentMarathonFile)
                 )
             }
         }
