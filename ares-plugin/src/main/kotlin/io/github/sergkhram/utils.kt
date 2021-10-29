@@ -192,8 +192,8 @@ fun getPropertyExecuteBy(aresExtension: ConfigurationExtension): ExecuteBy? {
     }
 }
 
-internal fun prepareMarathonLogAttachments(mapper: ObjectMapper, videoAtt: List<JsonNode>): JsonNode {
-    val path = videoAtt.first()["source"].asText()
+internal fun prepareMarathonLogAttachments(mapper: ObjectMapper, logAtt: List<JsonNode>): JsonNode {
+    val path = logAtt.first()["source"].asText()
     val separator = Paths.get(path).fileSystem.separator
     return mapper.createObjectNode().apply {
         this.put("name", "MarathonLog")
