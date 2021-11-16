@@ -1,7 +1,7 @@
 import java.net.URI
 
 group = "io.github.sergkhram"
-version = "1.2.7-RELEASE"
+version = "1.2.8-RELEASE"
 
 plugins {
     kotlin("jvm")
@@ -16,7 +16,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(gradleApi())
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
-    implementation("com.malinskiy:adam:0.2.3")
+    implementation("com.malinskiy.adam:adam:0.4.3")
 }
 
 java {
