@@ -1,7 +1,7 @@
 import java.net.URI
 
 group = "io.github.sergkhram"
-version = "1.2.7-RELEASE"
+version = "1.2.8-RELEASE"
 
 buildscript {
     dependencies {
@@ -9,7 +9,7 @@ buildscript {
         classpath(kotlin("stdlib-jdk8"))
         classpath(gradleApi())
         classpath("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
-        classpath("com.malinskiy:adam:0.2.3")
+        classpath("com.malinskiy.adam:adam:0.4.3")
         classpath("io.qameta.allure:allure-gradle:2.8.1")
         gradleApi()
     }
