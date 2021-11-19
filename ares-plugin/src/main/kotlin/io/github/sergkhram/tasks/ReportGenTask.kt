@@ -22,7 +22,7 @@ open class ReportGenTask: DefaultTask() {
         customLogger.info("Applying Allure Gradle Plugin")
         val allureDownloadTask = project.tasks.getByName("downloadAllure")
         (allureDownloadTask as DownloadAllure)?.let {
-            if(it.destinationDir?.get().asFile.exists()) {
+            if(!it.destinationDir.get().asFile.exists()) {
                 it.downloadAllure()
                 customLogger.info("Allure cmd downloaded")
             }
