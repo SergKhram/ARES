@@ -1,7 +1,7 @@
 import java.net.URI
 
 group = "io.github.sergkhram"
-version = "1.2.8-RELEASE"
+version = "1.2.9-RELEASE"
 
 buildscript {
     dependencies {
@@ -10,7 +10,10 @@ buildscript {
         classpath(gradleApi())
         classpath("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
         classpath("com.malinskiy.adam:adam:0.4.3")
-        classpath("io.qameta.allure:allure-gradle:2.8.1")
+        classpath("io.qameta.allure.gradle.allure:allure-plugin:2.9.6")
+        classpath("io.qameta.allure.gradle.report:allure-report-plugin:2.9.6")
+        classpath("io.qameta.allure.gradle.base:allure-base-plugin:2.9.6")
+        classpath("io.qameta.allure.gradle.adapter:allure-adapter-plugin:2.9.6")
         gradleApi()
     }
 
