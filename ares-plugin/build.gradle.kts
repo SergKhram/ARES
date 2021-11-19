@@ -1,7 +1,7 @@
 import java.net.URI
 
 group = "io.github.sergkhram"
-version = "1.2.7-RELEASE"
+version = "1.2.9-RELEASE"
 
 plugins {
     kotlin("jvm")
@@ -11,12 +11,15 @@ plugins {
 }
 
 dependencies {
-    implementation("io.qameta.allure:allure-gradle:2.8.1")
+    implementation("io.qameta.allure.gradle.allure:allure-plugin:2.9.6")
+    implementation("io.qameta.allure.gradle.report:allure-report-plugin:2.9.6")
+    implementation("io.qameta.allure.gradle.base:allure-base-plugin:2.9.6")
+    implementation("io.qameta.allure.gradle.adapter:allure-adapter-plugin:2.9.6")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.12.3")
     implementation(kotlin("stdlib-jdk8"))
     implementation(gradleApi())
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
-    implementation("com.malinskiy:adam:0.2.3")
+    implementation("com.malinskiy.adam:adam:0.4.3")
 }
 
 java {

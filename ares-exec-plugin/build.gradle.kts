@@ -1,7 +1,7 @@
 import java.net.URI
 
 group = "io.github.sergkhram"
-version = "1.2.7-RELEASE"
+version = "1.2.9-RELEASE"
 
 plugins {
     kotlin("jvm")
@@ -14,7 +14,10 @@ dependencies {
     implementation("com.malinskiy.marathon:marathon-gradle-plugin:0.6.2")
     implementation("com.malinskiy.marathon:base:0.6.2")
     implementation("com.malinskiy.marathon:core:0.6.2")
-    implementation("io.qameta.allure:allure-gradle:2.8.1")
+    implementation("io.qameta.allure.gradle.allure:allure-plugin:2.9.6")
+    implementation("io.qameta.allure.gradle.report:allure-report-plugin:2.9.6")
+    implementation("io.qameta.allure.gradle.base:allure-base-plugin:2.9.6")
+    implementation("io.qameta.allure.gradle.adapter:allure-adapter-plugin:2.9.6")
     implementation(project(":ares-plugin"))
 }
 

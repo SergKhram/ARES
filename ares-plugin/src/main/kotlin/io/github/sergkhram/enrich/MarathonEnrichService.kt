@@ -193,8 +193,14 @@ class MarathonEnrichService(
                         logger.debug("Starting adb client factory")
                         adb.initAdbClient()
                         withTimeoutOrNull(5000L) {
-                            val model = adb.getModel(serial)
-                            val osVersion = adb.getOsVersion(serial)
+                            var finalSerial: String
+                            if(serial.contains("127.0.0.1")) {
+                                finalSerial = serial.split(":").last()
+                            } else {
+                                finalSerial = serial
+                            }
+                            val model = adb.getModel(finalSerial)
+                            val osVersion = adb.getOsVersion(finalSerial)
                             if(!model.isNullOrBlank() && !osVersion.isNullOrBlank()) deviceInfo = DeviceInfo(model, osVersion)
                         }
                     }
