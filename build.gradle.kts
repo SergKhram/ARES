@@ -1,7 +1,7 @@
 import java.net.URI
 
 group = "io.github.sergkhram"
-version = "1.2.9-RELEASE"
+version = "1.2.10-RELEASE"
 
 buildscript {
     dependencies {
