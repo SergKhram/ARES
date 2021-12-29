@@ -6,7 +6,8 @@ import com.malinskiy.marathon.android.configuration.AllureConfiguration
 import com.malinskiy.marathon.device.DeviceFeature
 import io.github.sergkhram.*
 import io.github.sergkhram.configuration.Configuration
-import io.github.sergkhram.configuration.ConfigurationExtension
+import io.github.sergkhram.configuration.ExecuteBy
+import io.github.sergkhram.tasks.ConfigurationExtension
 import io.github.sergkhram.configuration.MarathonBlock
 import io.github.sergkhram.configuration.ScreenRecordAttachment
 import io.github.sergkhram.helpers.CustomException
@@ -87,5 +88,14 @@ fun ConfigurationExtension.setScreenRecordTypeFromMarathon(marathonTask: Maratho
         this.marathonBlock = MarathonBlock(screenRecordType = marathonVideoConfiguration)
     } else {
         this.marathonBlock!!.screenRecordType = marathonVideoConfiguration
+    }
+}
+
+fun getPropertyExecuteBy(aresExtension: ConfigurationExtension): ExecuteBy? {
+    return try {
+        System.getProperty("executeBy")?.let { ExecuteBy.valueOf(it) }
+            ?: aresExtension.testExecutionBlock?.executeBy?.let { ExecuteBy.valueOf(it) }
+    } catch (e: IllegalArgumentException) {
+        throw CustomException("There is no chosen executeBy variant, only these values are supported : ${ExecuteBy.values().map {it.name}}")
     }
 }

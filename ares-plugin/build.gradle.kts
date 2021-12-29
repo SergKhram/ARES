@@ -1,11 +1,11 @@
 import java.net.URI
 
 group = "io.github.sergkhram"
-version = "1.2.10-RELEASE"
+version = "1.2.11-RELEASE"
 
 plugins {
     kotlin("jvm")
-    `kotlin-dsl`
+    id("org.gradle.kotlin.kotlin-dsl") version "1.4.9"
     `maven-publish`
     signing
 }
@@ -20,6 +20,7 @@ dependencies {
     implementation(gradleApi())
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
     implementation("com.malinskiy.adam:adam:0.4.3")
+    implementation(project(":ares-core"))
 }
 
 java {

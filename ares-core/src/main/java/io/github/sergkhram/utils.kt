@@ -3,7 +3,6 @@ package io.github.sergkhram
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.sergkhram.configuration.Configuration
-import io.github.sergkhram.configuration.ConfigurationExtension
 import io.github.sergkhram.configuration.ExecuteBy
 import io.github.sergkhram.configuration.ScreenRecordAttachment
 import io.github.sergkhram.helpers.AresLogger
@@ -19,7 +18,7 @@ import java.nio.file.Files.copy
 import java.nio.file.Files.createDirectories
 import java.nio.file.attribute.BasicFileAttributes
 
-val logger = AresLogger(AresPlugin::class.java)
+val logger = AresLogger(AresCore::class.java)
 
 val marathonVideoDir: (String) -> File = {
     File("${it}video")
@@ -106,7 +105,7 @@ internal fun createAllureResultsDirectory(projectDirectory: String) {
     recursivelyDelete(directory)
 }
 
-internal fun recursivelyDelete(directory: File) {
+fun recursivelyDelete(directory: File) {
     if (!directory.exists()) {
         directory.mkdir()
     } else {
@@ -182,15 +181,6 @@ val androidHomeDir: File? =
             }
         }
     }
-
-fun getPropertyExecuteBy(aresExtension: ConfigurationExtension): ExecuteBy? {
-    return try {
-        System.getProperty("executeBy")?.let { ExecuteBy.valueOf(it) }
-            ?: aresExtension.testExecutionBlock?.executeBy?.let { ExecuteBy.valueOf(it) }
-    } catch (e: IllegalArgumentException) {
-        throw CustomException("There is no chosen executeBy variant, only these values are supported : ${ExecuteBy.values().map {it.name}}")
-    }
-}
 
 internal fun prepareMarathonLogAttachments(mapper: ObjectMapper, logAtt: List<JsonNode>): JsonNode {
     val path = logAtt.first()["source"].asText()

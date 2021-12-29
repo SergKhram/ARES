@@ -1,6 +1,6 @@
 package io.github.sergkhram
 
-import io.github.sergkhram.configuration.ConfigurationExtension
+import io.github.sergkhram.tasks.ConfigurationExtension
 import io.github.sergkhram.tasks.ReportGenTask
 import io.github.sergkhram.tasks.ReportSyncTask
 import io.qameta.allure.gradle.adapter.AllureAdapterPlugin
