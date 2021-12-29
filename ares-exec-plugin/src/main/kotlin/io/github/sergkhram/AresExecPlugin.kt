@@ -2,12 +2,8 @@ package io.github.sergkhram
 
 import com.malinskiy.marathon.MarathonPlugin
 import com.malinskiy.marathon.MarathonRunTask
-import io.github.sergkhram.configuration.ConfigurationExtension
 import io.github.sergkhram.configuration.ExecuteBy
-import io.github.sergkhram.tasks.ExecutionWReportGenTask
-import io.github.sergkhram.tasks.ExecutionWReportTask
-import io.github.sergkhram.tasks.enableAllureForMarathon
-import io.github.sergkhram.tasks.setScreenRecordTypeFromMarathon
+import io.github.sergkhram.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.*

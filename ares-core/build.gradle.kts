@@ -5,35 +5,22 @@ version = "1.2.11-RELEASE"
 
 plugins {
     kotlin("jvm")
-    id("org.gradle.kotlin.kotlin-dsl") version "1.4.9"
     `maven-publish`
     signing
 }
 
 dependencies {
-    implementation("com.malinskiy.marathon:marathon-gradle-plugin:0.6.2")
-    implementation("com.malinskiy.marathon:base:0.6.2")
-    implementation("com.malinskiy.marathon:core:0.6.2")
-    implementation("io.qameta.allure.gradle.allure:allure-plugin:2.9.6")
-    implementation("io.qameta.allure.gradle.report:allure-report-plugin:2.9.6")
-    implementation("io.qameta.allure.gradle.base:allure-base-plugin:2.9.6")
-    implementation("io.qameta.allure.gradle.adapter:allure-adapter-plugin:2.9.6")
-    implementation(project(":ares-plugin"))
-    implementation(project(":ares-core"))
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.3")
+    implementation(kotlin("stdlib-jdk8"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3")
+    implementation("com.malinskiy.adam:adam:0.4.3")
+    implementation("org.apache.ant:ant:1.8.2")
+    implementation("org.slf4j:slf4j-simple:2.0.0-alpha5")
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-gradlePlugin {
-    (plugins) {
-        create("aresExecPlugin") {
-            id = "io.github.sergkhram.aresExecPlugin"
-            implementationClass = "io.github.sergkhram.AresExecPlugin"
-        }
-    }
 }
 
 signing {
@@ -61,9 +48,9 @@ publishing {
             artifact(sourcesJar)
             artifact(javadocJar)
             pom {
-                name.set("ares-exec")
+                name.set("ares-core")
                 url.set("https://github.com/SergKhram/ARES")
-                description.set("Android report synchro plugin + execution")
+                description.set("Android Core")
 
                 this.licenses {
                     license {

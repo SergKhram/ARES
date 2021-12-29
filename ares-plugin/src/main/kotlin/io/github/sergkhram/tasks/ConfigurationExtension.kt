@@ -1,7 +1,8 @@
-package io.github.sergkhram.configuration
+package io.github.sergkhram.tasks
 
 import groovy.lang.Closure
 import io.github.sergkhram.androidHomeDir
+import io.github.sergkhram.configuration.*
 import io.github.sergkhram.helpers.CustomException
 import org.gradle.api.Project
 import java.io.File
